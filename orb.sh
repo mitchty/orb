@@ -1,11 +1,10 @@
 #!/bin/sh
 #-*-mode: Shell-script; coding: utf-8;-*-
 orb_ruby_base=${orb_ruby_base:=$HOME/.rubies}
+ORB_VERBOSE=${ORB_VERBOSE:=N}
 
 function orb_ls_path {
-  for x in $(echo $PATH | sed -e 's/\:/ /g'); do
-    [[ -d "$x" ]] && echo $x
-  done
+  echo $PATH | sed -e 's/\:/ /g' | fmt -1
 }
 
 function orb_to_path {
@@ -29,31 +28,39 @@ function orb_add_path {
   eval "export PATH"
 }
 
-function orbimplode {
-  rm_path $orb_ruby_base
+function orb_implode {
+  orb_rm_path $orb_ruby_base
 }
 
 function orb_use_ruby {
-  orbimplode
+  orb_implode
   new="$orb_ruby_base/$1/bin"
-  [[ -d $new ]] && add_path $new
+  if [[ -d $new ]]; then
+    add_path $new
+  else
+    echo "cannot find bin dir at $new"
+  fi
+}
+
+function orb_echo {
+  [[ ${ORB_VERBOSE} != 'N' ]] && echo $?
 }
 
 function orb {
   tmp=$PS3
   PS3='ruby?: '
-  select aruby in $(cd $orb_ruby_base && echo "system" && echo *)
+  select aruby in $(cd $orb_ruby_base && echo "system " * | fmt -1 | grep -v '^\.' | fmt -1000)
   do
     if [[ -n $aruby ]]; then
       PS3=$tmp
       # zsh select on osx is acting pissy, this gets around it
       echo $aruby | grep 'system' > /dev/null 2>&1
       if [[ $? -eq 0 ]]; then
-        echo "Removing $ruby_base from \$PATH"
-        orbimplode
+        orb_echo "Removing $orb_ruby_base from \$PATH"
+        orb_implode
         break
       fi
-      echo "Adding $aruby to \$PATH"
+      orb_echo "Adding $aruby to \$PATH"
       orb_use_ruby $aruby
       break
     else
