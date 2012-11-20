@@ -43,7 +43,7 @@ function orb_use_ruby {
 }
 
 function orb_echo {
-  [[ ${ORB_VERBOSE} != 'N' ]] && echo $?
+  [[ ${ORB_VERBOSE} != 'N' ]] && echo $*
 }
 
 function orb {
