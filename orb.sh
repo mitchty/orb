@@ -1,6 +1,10 @@
 #!/bin/sh
 #-*-mode: Shell-script; coding: utf-8;-*-
-orb_ruby_base=${orb_ruby_base:=$HOME/.rubies}
+orb_base=${orb_base:=$HOME}
+orb_ruby_base=${orb_ruby_base:=$orb_base/.rubies}
+orb_perl_base=${orb_perl_base:=$orb_base/.perls}
+orb_python_base=${orb_python_base:=$orb_base/.pythons}
+
 ORB_VERBOSE=${ORB_VERBOSE:=N}
 
 function orb_ls_path {
@@ -29,42 +33,84 @@ function orb_add_path {
 }
 
 function orb_implode {
+  orb_implode_ruby
+  orb_implode_perl
+}
+
+function orb_implode_ruby {
   orb_rm_path $orb_ruby_base
 }
 
-function orb_use_ruby {
-  orb_implode
-  new="$orb_ruby_base/$1/bin"
-  if [[ -d $new ]]; then
-    add_path $new
+function orb_implode_perl {
+  orb_rm_path $orb_perl_base
+}
+
+function orb_implode_python {
+  orb_rm_path $orb_python_base
+}
+
+function orb_add_bin {
+  has_bin="$1/bin"
+  if [[ -d $has_bin ]]; then
+    orb_add_path $has_bin
   else
-    echo "cannot find bin dir at $new"
+    orb_echo "$has_bin not found!"
+    return 1
   fi
+}
+
+function orb_use_ruby {
+  orb_implode_ruby
+  orb_add_bin "$orb_ruby_base/$1"
+}
+
+function orb_use_perl {
+  orb_implode_perl
+  orb_add_bin "$orb_perl_base/$1"
+}
+
+function orb_use_python {
+  orb_implode_python
+  orb_add_bin "$orb_python_base/$1"
 }
 
 function orb_echo {
   [[ ${ORB_VERBOSE} != 'N' ]] && echo $*
 }
 
-function orb {
+function orb_pick {
+  lang=$1
   tmp=$PS3
-  PS3='ruby?: '
-  select aruby in $(cd $orb_ruby_base && echo "system " * | fmt -1 | grep -v '^\.' | fmt -1000)
-  do
-    if [[ -n $aruby ]]; then
+  PS3="$lang?: "
+  base="orb_${lang}_base"
+  cd_dir=$(eval "echo \$$base")
+  select option in $(cd $cd_dir && echo "system " * | fmt -1 | grep -v '^\.' | fmt -1000); do
+    if [[ -n $option ]]; then
       PS3=$tmp
-      # zsh select on osx is acting pissy, this gets around it
-      echo $aruby | grep 'system' > /dev/null 2>&1
+      # workaround for osx zsh select
+      echo $option | grep 'system' > /dev/null 2>&1
       if [[ $? -eq 0 ]]; then
-        orb_echo "Removing $orb_ruby_base from \$PATH"
-        orb_implode
+        orb_echo "Removing $cd_dir from \$PATH"
+        eval "orb_implode_${lang}"
         break
       fi
-      orb_echo "Adding $aruby to \$PATH"
-      orb_use_ruby $aruby
+      orb_echo "Adding ${cd_dir}/$option/bin to \$PATH"
+      eval "orb_use_${lang} $option"
       break
     else
-      echo "Invalid selection $aruby"
+      echo "Invalid selection $option"
     fi
   done
+}
+
+function orb {
+  orb_pick 'ruby'
+}
+
+function opl {
+  orb_pick 'perl'
+}
+
+function opy {
+  orb_pick 'python'
 }
