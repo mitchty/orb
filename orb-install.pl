@@ -287,7 +287,7 @@ sub install_ruby {
     configure_dir( $dirname, $configure );
   } else {
     $dirname = 'ruby-git';
-    fetch_git( 'http://github.com/ruby/ruby', $dirname );
+    fetch_git( 'https://github.com/ruby/ruby', $dirname );
     chdir "$cache_dir\/$dirname";
     system 'make clean';
     system 'autoconf';
@@ -312,7 +312,7 @@ sub install_rbx {
   my $fulldir = "$cache_dir\/$dirname";
   my $configure =
 "--prefix=$install_prefix --default-version=19 --with-include-dir=$install_prefix/include --with-lib-dir=$install_prefix/lib";
-  fetch_git( 'http://github.com/rubinius/rubinius', $dirname );
+  fetch_git( 'https://github.com/rubinius/rubinius', $dirname );
   chdir $fulldir;
   system 'rake clean';
   configure_dir( $dirname, $configure );
