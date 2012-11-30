@@ -346,8 +346,45 @@ sub install_jruby {
     chdir "$install_prefix\/bin";
     system 'ln -s jruby ruby';
   } else {
-    say 'Some day I\'ll be a big function and build jruby-head';
+    $dirname = 'jruby-git';
+    fetch_git( 'https://github.com/jruby/jruby', $dirname );
+    chdir "$cache_dir\/$dirname";
+    chdir 'jruby';
+    system 'ant clean';
+    system 'ant';
+    system 'ant dist';
+    chdir 'dist';
+    my $dir = qx(pwd);
+    chomp($dir);
+    my $distfile = <jruby-bin*tar.gz>;
+    my $distfile_full = "$dir/" . $distfile;
+
+    if ( -f $distfile ) {
+      extract_tgz($distfile_full);
+      my $extract_dir = $distfile;
+      $extract_dir =~ s/[.]tar[.]gz//sm;
+      $extract_dir =~ s/[-]bin//sm;
+      say $extract_dir;
+      system "mv $extract_dir $install_prefix";
+      jruby_finalize($install_prefix);
+    }else {
+      say "zomg";
+    }
   }
+  return;
+}
+
+sub jruby_finalize {
+  my $pwd = qx(pwd);
+  my $dir = shift;
+  say 'Removing windows stuffs.';
+  my $cmd =
+"rm -f $dir/bin/*.exe $dir/bin/*.dll $dir/bin/*.bat $dir/bin/jruby.sh";
+  say $cmd;
+  system $cmd;
+  chdir "$dir\/bin";
+  system 'ln -s jruby ruby';
+  chdir $pwd;
   return;
 }
 
