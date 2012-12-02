@@ -138,7 +138,7 @@ sub sanity_check {
   if ($append_prefix) {
     $install_prefix = "$install_prefix/$ruby_vm-$ruby_version";
     if ($suffix) {
-      $install_prefix = "$install_prefix" . "_$suffix";
+      $install_prefix = "$install_prefix" . "\%$suffix";
     }
     if ( -d $install_prefix ) {
       say "Removing existing install $install_prefix";
