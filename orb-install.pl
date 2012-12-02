@@ -26,9 +26,10 @@ use Env qw(HOME LDFLAGS CPPFLAGS);
 use File::Path qw(make_path);
 
 # Globals, run away
+my $base_prefix    = $HOME;
 my $default_prefix = "$HOME/.rubies";
 my $install_prefix = $default_prefix;
-my $cache_dir      = "$default_prefix/.cache";
+my $cache_dir      = "$base_prefix/.orb-cache";
 my $install_yaml   = 1;
 my $install_ffi    = 1;
 my $append_prefix  = 1;
@@ -111,7 +112,7 @@ FIN
 
 sub rubyurl {
   my $version = shift;
-  $version =~ /1[.]\d+/sm;
+  $version =~ /\d[.]\d+/sm;
   my $major   = $&;
   my $out_url = "http://ftp.ruby-lang.org/pub/ruby/$major/ruby-$version.tar.gz";
   return $out_url;
