@@ -1,9 +1,9 @@
 #!/bin/sh
 #-*-mode: Shell-script; coding: utf-8;-*-
 orb_base=${orb_base:=$HOME/.orb}
-orb_ruby_base=${orb_ruby_base:=$orb_base/.rubies}
-orb_perl_base=${orb_perl_base:=$orb_base/.perls}
-orb_python_base=${orb_python_base:=$orb_base/.pythons}
+orb_ruby_base=${orb_ruby_base:=$orb_base/rubies}
+orb_perl_base=${orb_perl_base:=$orb_base/perls}
+orb_python_base=${orb_python_base:=$orb_base/pythons}
 
 ORB_VERBOSE=${ORB_VERBOSE:=N}
 
