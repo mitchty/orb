@@ -26,7 +26,7 @@ use Env qw(HOME LDFLAGS CPPFLAGS);
 use File::Path qw(make_path);
 
 # Globals, run away
-my $base_prefix    = "$HOME"/.orb;
+my $base_prefix    = "$HOME/.orb";
 my $default_prefix = "$base_prefix/rubies";
 my $install_prefix = $default_prefix;
 my $cache_dir      = "$base_prefix/cache";
