@@ -17,62 +17,98 @@
 ## no critic (ValuesAndExpressions::RequireQuotedHeredocTerminator)
 ## no critic (Miscellanea::ProhibitUselessNoCritic)
 ## no critic (Subroutines::RequireFinalReturn)
-
 use strict;
 use warnings;
 
 use Getopt::Long;
-use Env qw(HOME LDFLAGS CPPFLAGS);
+use Env qw(HOME LDFLAGS CPPFLAGS orb_cache orb_base);
+use POSIX qw(getcwd);
 use File::Path qw(make_path);
-
-# Globals, run away
-my $base_prefix    = "$HOME/.orb";
-my $default_prefix = "$base_prefix/rubies";
-my $install_prefix = $default_prefix;
-my $cache_dir      = "$base_prefix/cache";
-my $install_yaml   = 1;
-my $install_ffi    = 1;
-my $append_prefix  = 1;
-my $ruby_vm        = 'default';
-my $ruby_version   = 'default';
-my $rm_existing    = 0;
-my $suffix         = undef;
-
-# ruby vm defaults
-my $default_ruby  = '1.9.3-p327';
-my $default_jruby = '1.7.1';
-my $default_rbx   = 'head';
+use File::Basename qw(dirname basename);
 
 # Defining say here only due to wanting to be able to be run on perls
 # older than 5.10ish.
-unless ( defined say() ) { ## no critic (CodeLayout::ProhibitParensWithBuiltins)
-  ## no critic (Subroutines::RequireArgUnpacking)
-  sub say {                ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 
+## no critic (CodeLayout::ProhibitParensWithBuiltins)
+## no critic (Subroutines::RequireArgUnpacking)
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+unless ( defined say() ) {
+
+  sub say {
     local $\ = "\n";
     foreach my $line (@_) { print $line; }
     return;
   }
 }
 
-GetOptions(
-            'prefix=s'  => \$install_prefix,
-            'no-yaml'   => sub { $install_yaml = 0; },
-            'no-ffi'    => sub { $install_ffi = 0; },
-            'ruby=s'    => \$ruby_vm,
-            'version=s' => \$ruby_version,
-            'cache=s'   => \$cache_dir,
-            'no-append' => sub { $append_prefix = 0; },
-            'append'    => sub { $append_prefix = 1; },
-            'rm'        => sub { $rm_existing = 1; },
-            'suffix=s'  => \$suffix,
-            'help' => sub { help(1); },
-            'h'    => sub { help(1); },
-          ) or help(1);
+my $script_language = 'unknown';
+my $script_name     = basename($0);
+
+if ( $script_name =~ /^(perl|python|ruby)[-]/mxsi ) {
+  $script_language = $&;
+  $script_language =~ s/[-]//msg;
+}
+
+my %lang_dir_map = (
+                     'ruby'    => 'rubies',
+                     'perl'    => 'perls',
+                     'python'  => 'pythons',
+                     'unknown' => 'unknowns',
+                   );
+
+# Globals, run away
+my $base_prefix    = ( defined $orb_base ) ? $orb_base : "$HOME/.orb";
+my $default_prefix = $base_prefix . q{/} . $lang_dir_map{$script_language};
+my $install_prefix = $default_prefix;
+my $cache_dir      = ( defined $orb_cache ) ? $orb_cache : "$base_prefix/cache";
+my $install_yaml   = 1;
+my $install_ffi    = 1;
+my $append_prefix  = 1;
+my $lang_vm        = 'default';
+my $lang_version   = 'default';
+my $rm_existing    = 0;
+my $suffix         = undef;
+
+# perl specific
+my $perl_install_cpanm = 0;
+my $perl_run_tests     = 1;
+
+# language vm defaults
+my %lang_defaults = (
+                      'ruby'  => '1.9.3-p327',
+                      'jruby' => '1.7.1',
+                      'rbx'   => 'head',
+                      'perl'  => '5.16.2',
+                    );
+
+my $help_message = 'default help message';
 
 sub help {
   my $rc = shift || 1;
-  my $message = <<FIN;
+  say $help_message;
+  exit $rc;
+}
+
+# Hacky, but it'll do.
+if ( $script_language eq 'ruby' ) {
+
+  GetOptions(
+              'prefix=s'  => \$install_prefix,
+              'no-yaml'   => sub { $install_yaml = 0; },
+              'no-ffi'    => sub { $install_ffi = 0; },
+              'ruby=s'    => \$lang_vm,
+              'version=s' => \$lang_version,
+              'cache=s'   => \$cache_dir,
+              'no-append' => sub { $append_prefix = 0; },
+              'append'    => sub { $append_prefix = 1; },
+              'rm'        => sub { $rm_existing = 1; },
+              'suffix=s'  => \$suffix,
+              'help' => sub { help(1); },
+              'h'    => sub { help(1); },
+            )
+    or help(1);
+
+  $help_message = <<FIN;
 usage:
 $0 --prefix=$install_prefix
   --cache=$cache_dir
@@ -84,9 +120,9 @@ $0 --prefix=$install_prefix
       Default: ruby
     --version  What version of ruby to install, reference defaults.
       Note:    if you specify head on any you will get the latest master
-      Default: ruby  = $default_ruby
-               jruby = $default_jruby
-               rbx   = $default_rbx (from git)
+      Default: ruby  = $lang_defaults{'ruby'}
+               jruby = $lang_defaults{'jruby'}
+               rbx   = $lang_defaults{'rbx'} (from git)
     --prefix   What directory to install to, need to have write perms.
       Default: $install_prefix
     --cache    Where to save what we download.
@@ -106,8 +142,54 @@ $0 --prefix=$install_prefix
       Default: Append. Say prefix is /tmp/foo, with this on you would
                Install to /tmp/foo/ruby-1.9.3-p0 for example.
 FIN
-  say $message;
-  exit $rc;
+
+} elsif ( $script_language eq 'perl' ) {
+  GetOptions(
+    'prefix=s'  => \$install_prefix,
+    'version=s' => \$lang_version,
+    'cache=s'   => \$cache_dir,
+    'no-append' => sub { $append_prefix = 0; },
+    'append'    => sub { $append_prefix = 1; },
+    'rm'        => sub { $rm_existing = 1; },
+    'suffix=s'  => \$suffix,
+    'no-cpanm'  => sub { $perl_install_cpanm = 1; },
+
+    # yes this is wonky, its inverted for a later conditional
+    # it makes the if test more readable... ish
+    'no-test' => sub { $perl_run_tests = 0; },
+    'help'    => sub { help(1); },
+    'h'       => sub { help(1); },
+            )
+    or help(1);
+
+  $help_message = <<FIN;
+usage:
+$0 --prefix=$install_prefix
+  --cache=$cache_dir
+  --version=[head|vm_version]
+
+  Options:
+    --version  What version of perl to install, reference defaults.
+      Note:    if you specify head on any you will get the latest master
+      Default: perl = $lang_defaults{'perl'}
+    --prefix   What directory to install to, need to have write perms.
+      Default: $install_prefix
+    --cache    Where to save what we download.
+      Default: $cache_dir
+    --rm       Remove the install to dir before installing.
+      Note:    Only allowed if prefix isn't set.
+    --append   Append a string to the install to allow tagging.
+      Example: --append=foo with defaults results in perl-version
+      Default: nope
+    --no-append  Append the perl/version information to the prefix install?
+      Default: Append. Say prefix is /tmp/foo, with this on you would
+               Install to /tmp/foo/perl-5.16.2 for example.
+FIN
+
+} else {
+  say $script_language;
+  say "no idea what is being asked, was called as \"$script_name\"";
+  exit 1;
 }
 
 sub rubyurl {
@@ -116,6 +198,37 @@ sub rubyurl {
   my $major   = $&;
   my $out_url = "http://ftp.ruby-lang.org/pub/ruby/$major/ruby-$version.tar.gz";
   return $out_url;
+}
+
+sub perlurl {
+  my $version = shift;
+  $version =~ /(\d)[.]\d+/sm;
+  ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
+  my $major   = $1 . '.0';
+  my $out_url = "http://www.cpan.org/src/$major/perl-$version.tar.gz";
+  return $out_url;
+}
+
+sub full_vm_version {
+  my %vm_map = (
+                 'ruby'  => $lang_defaults{'ruby'},
+                 'rbx'   => $lang_defaults{'rbx'},
+                 'jruby' => $lang_defaults{'jruby'},
+                 'perl'  => $lang_defaults{'perl'},
+               );
+
+  my %vm_defaults = (
+                      'ruby' => 'ruby',
+                      'perl' => 'perl',
+                    );
+
+  $lang_vm = ( $lang_vm eq 'default' ) ? $script_language : $lang_vm;
+  $lang_version =
+    ( $lang_version eq 'default' ) ? $vm_map{$lang_vm} : $lang_version;
+
+  say "Will try to build/install $lang_vm at version $lang_version";
+
+  return;
 }
 
 sub sanity_check {
@@ -131,12 +244,12 @@ sub sanity_check {
     make_path $cache_dir or die "Cannot create $cache_dir!\n";
   }
 
-  full_rubyversion();
+  full_vm_version();
 
   $append_prefix = 0 if ( $default_prefix ne $install_prefix );
 
   if ($append_prefix) {
-    $install_prefix = "$install_prefix/$ruby_vm-$ruby_version";
+    $install_prefix = "$install_prefix/$lang_vm-$lang_version";
     if ($suffix) {
       $install_prefix = "$install_prefix" . "\%$suffix";
     }
@@ -146,6 +259,7 @@ sub sanity_check {
     }
   }
 
+  say "Installing to $install_prefix";
   return $insane;
 }
 
@@ -184,12 +298,15 @@ sub fetch_url {
 }
 
 sub full_rubyversion {
-  my %vm_map =
-    ( 'ruby', $default_ruby, 'rbx', $default_rbx, 'jruby' => $default_jruby );
-  $ruby_vm = ( $ruby_vm eq 'default' ) ? 'ruby' : $ruby_vm;
-  $ruby_version =
-    ( $ruby_version eq 'default' ) ? $vm_map{$ruby_vm} : $ruby_version;
-  say "Will try to build/install $ruby_vm at version $ruby_version";
+  my %vm_map = (
+                 'ruby'  => $lang_defaults{'ruby'},
+                 'rbx'   => $lang_defaults{'rbx'},
+                 'jruby' => $lang_defaults{'jruby'},
+               );
+  $lang_vm = ( $lang_vm eq 'default' ) ? 'ruby' : $lang_vm;
+  $lang_version =
+    ( $lang_version eq 'default' ) ? $vm_map{$lang_vm} : $lang_version;
+  say "Will try to build/install $lang_vm at version $lang_version";
   return;
 }
 
@@ -213,11 +330,19 @@ sub configure_dir {
   return $?;
 }
 
-sub build_install {
-  my $dir = shift;
+sub run_make {
+  my $dir  = shift;
+  my @rest = @_;
+  say $dir;
+
   chdir $dir;
-  system 'make && make install';
-  die "make failed\n" if $?;
+  system 'make';
+  die "make failed $?\n" if $?;
+  for my $cmd (@rest) {
+    my $make_cmd = "make $cmd";
+    system $make_cmd;
+    die "$make_cmd failed\n" if $?;
+  }
   return $?;
 }
 
@@ -229,7 +354,7 @@ sub install_yaml {
   fetch_url($url);
   extract_tgz($filename);
   configure_dir( $dirname, "--prefix=$install_prefix" );
-  build_install($dirname);
+  run_make( $dirname, 'install' );
   return;
 }
 
@@ -261,7 +386,7 @@ sub install_ffi {
   chdir "$cache_dir/$dirname";
   system 'make clean';
   configure_dir( $dirname, "--prefix=$install_prefix" );
-  build_install($dirname);
+  run_make( $dirname, 'install' );
   return;
 }
 
@@ -276,8 +401,8 @@ sub install_ruby {
   my $dirname = q{};
   my $configure =
 "--prefix=$install_prefix --disable-tk --disable-tcl --disable-install-doc --enable-pthread --with-opt-dir=$install_prefix --with-static-linked-ext --disable-tcltk";
-  if ( $ruby_version ne 'head' ) {
-    my $url  = rubyurl("$ruby_version");
+  if ( $lang_version ne 'head' ) {
+    my $url  = rubyurl("$lang_version");
     my $file = url_filename($url);
     $dirname = "$cache_dir/$file";
     $dirname =~ s/[.]tar[.]gz//sm;
@@ -297,7 +422,7 @@ sub install_ruby {
     }
     configure_dir( $dirname, "$configure" );
   }
-  build_install($dirname);
+  run_make( $dirname, 'install' );
   return;
 }
 
@@ -324,9 +449,9 @@ sub install_rbx {
 sub install_jruby {
   chdir $cache_dir;
   my $dirname = q{};
-  if ( $ruby_version ne 'head' ) {
+  if ( $lang_version ne 'head' ) {
     my $url =
-"http://jruby.org.s3.amazonaws.com/downloads/$ruby_version/jruby-bin-$ruby_version.tar.gz";
+"http://jruby.org.s3.amazonaws.com/downloads/$lang_version/jruby-bin-$lang_version.tar.gz";
     my $file = url_filename($url);
     $dirname = $file;
     $dirname =~ s/[.]tar[.]gz//sm;
@@ -357,7 +482,7 @@ sub install_jruby {
     chdir 'dist';
     my $dir = qx(pwd);
     chomp($dir);
-    my $distfile = <jruby-bin*tar.gz>;
+    my $distfile      = glob('jruby-bin*tar.gz');
     my $distfile_full = "$dir/" . $distfile;
 
     if ( -f $distfile ) {
@@ -368,8 +493,8 @@ sub install_jruby {
       say $extract_dir;
       system "mv $extract_dir $install_prefix";
       jruby_finalize($install_prefix);
-    }else {
-      say "zomg";
+    } else {
+      say 'zomg';
     }
   }
   return;
@@ -380,23 +505,79 @@ sub jruby_finalize {
   my $dir = shift;
   say 'Removing windows stuffs.';
   my $cmd =
-"rm -f $dir/bin/*.exe $dir/bin/*.dll $dir/bin/*.bat $dir/bin/jruby.sh";
+    "rm -f $dir/bin/*.exe $dir/bin/*.dll $dir/bin/*.bat $dir/bin/jruby.sh";
   say $cmd;
   system $cmd;
+  my $ruby_link = "$dir\/bin/ruby";
   chdir "$dir\/bin";
-  system 'ln -s jruby ruby';
+  system 'ln -s jruby ruby' unless ( -f $ruby_link );
   chdir $pwd;
   return;
 }
 
+sub perl_finalize {
+  my $perl_install = shift;
+  my $perl_bin     = "$perl_install\/bin/perl";
+
+  if ( -f $perl_bin ) {
+    say $perl_bin;
+    unless ($perl_install_cpanm) {
+      say "Setting up cpanm for $perl_install";
+      my $cpanm_install_cmd =
+        "curl -L http://cpanmin.us | $perl_bin - --self-upgrade";
+      say $cpanm_install_cmd;
+      system($cpanm_install_cmd);
+    }
+  }
+}
+
+sub install_perl {
+  my $pwd = getcwd();
+
+  my $dirname = q{};
+  my $configure =
+"sh Configure -ds -e -Dprefix=$install_prefix -Dvendorprefix=$install_prefix -D optimize='-Os -Wall -g -pipe' -U use5005threads -D usethreads -D usemultiplicity -D uselargefiles -D use64bitint -D useshrplib";
+
+  if ( $^O eq 'linux' ) {
+    $configure = $configure . ' -Dnoextensions=ODBM_File';
+  }
+
+  if ( $lang_version ne 'head' ) {
+    my $url  = perlurl($lang_version);
+    my $file = url_filename($url);
+    $dirname = "$cache_dir/$file";
+    $dirname =~ s/[.]tar[.]gz//sm;
+    my $filename = "$cache_dir/$file";
+    fetch_url($url);
+    extract_tgz($filename);
+    chdir $dirname;
+
+    # just in case, don't want any cached values being used.
+    unlink('config.sh') if ( -f 'config.sh' );
+    system($configure);
+
+    if ($perl_run_tests) {
+      run_make( $dirname, 'test', 'install' );
+    } else {
+      say 'Not testing installation prior to install';
+      run_make( $dirname, 'install' );
+    }
+  }
+
+  perl_finalize($install_prefix);
+  return;
+}
+
 my %install_switch = (
-                       'ruby',  sub { install_ruby(); },
-                       'rbx',   sub { install_rbx(); },
-                       'jruby', sub { install_jruby(); },
+                       'ruby'    => sub { install_ruby(); },
+                       'rbx'     => sub { install_rbx(); },
+                       'jruby'   => sub { install_jruby(); },
+                       'perl'    => sub { install_perl(); },
+                       'default' => sub { die "bug!\n"; },
                      );
 
 if ( sanity_check() ) {
   say 'Cannot continue without a sane installation of above junk.';
 } else {
-  $install_switch{$ruby_vm}();
+  $install_switch{$lang_vm}();
 }
