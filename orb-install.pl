@@ -40,7 +40,7 @@ my $suffix         = undef;
 
 # ruby vm defaults
 my $default_ruby  = '1.9.3-p327';
-my $default_jruby = '1.7.0';
+my $default_jruby = '1.7.1';
 my $default_rbx   = 'head';
 
 # Defining say here only due to wanting to be able to be run on perls
