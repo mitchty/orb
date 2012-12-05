@@ -35,6 +35,36 @@ function orb_add_path {
 function orb_implode {
   orb_implode_ruby
   orb_implode_perl
+  orb_implode_python
+  orb_implode_all
+}
+
+# unset everything we've done
+function orb_implode_all {
+  unset orb_ls_path
+  unset orb_to_path
+  unset orb_shift_path
+  unset orb_rm_path
+  unset orb_add_path
+  unset orb_add_bin
+  unset orb_use_ruby
+  unset orb_use_perl
+  unset orb_use_python
+  unset orb_echo
+  unset orb_pick
+  unset orb_implode_ruby
+  unset orb_implode_perl
+  unset orb_implode_python
+  unset orb
+  unset opl
+  unset opy
+  unset orb_implode
+  unset ORB_VERBOSE
+  unset orb_base
+  unset orb_ruby_base
+  unset orb_perl_base
+  unset orb_python_base
+  unset orb_implode_all
 }
 
 function orb_implode_ruby {
