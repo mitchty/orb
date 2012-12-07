@@ -133,14 +133,42 @@ function orb_pick {
   done
 }
 
+function orb_pick_private {
+  lang=$1
+  shift
+  do_index=0
+  for param in $*; do
+    [ "$param" = 'do' ] && break
+    (( do_index=do_index+1 ))
+  done
+
+  if [[ $do_index != 0 ]]; then
+    index=0
+    typeset -a vm
+    until [ $index -eq $do_index ]; do
+      (( index=index+1 ))
+      vm[$index]=$1
+      shift
+    done
+    shift
+    for a in ${vm[@]}; do
+      eval "orb_use_${lang} $a"
+      orb_echo $(which $lang)
+      eval $*
+    done
+  else
+    orb_pick $lang
+  fi
+}
+
 function orb {
-  orb_pick 'ruby'
+  orb_pick_private 'ruby' $*
 }
 
 function opl {
-  orb_pick 'perl'
+  orb_pick_private 'perl' $*
 }
 
 function opy {
-  orb_pick 'python'
+  orb_pick_private 'python' $*
 }
