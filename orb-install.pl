@@ -91,23 +91,6 @@ sub help {
 
 # Hacky, but it'll do.
 if ( $script_language eq 'ruby' ) {
-
-  GetOptions(
-              'prefix=s'  => \$install_prefix,
-              'no-yaml'   => sub { $install_yaml = 0; },
-              'no-ffi'    => sub { $install_ffi = 0; },
-              'ruby=s'    => \$lang_vm,
-              'version=s' => \$lang_version,
-              'cache=s'   => \$cache_dir,
-              'no-append' => sub { $append_prefix = 0; },
-              'append'    => sub { $append_prefix = 1; },
-              'rm'        => sub { $rm_existing = 1; },
-              'suffix=s'  => \$suffix,
-              'help' => sub { help(1); },
-              'h'    => sub { help(1); },
-            )
-    or help(1);
-
   $help_message = <<FIN;
 usage:
 $0 --prefix=$install_prefix
@@ -143,25 +126,22 @@ $0 --prefix=$install_prefix
                Install to /tmp/foo/ruby-1.9.3-p0 for example.
 FIN
 
-} elsif ( $script_language eq 'perl' ) {
   GetOptions(
-    'prefix=s'  => \$install_prefix,
-    'version=s' => \$lang_version,
-    'cache=s'   => \$cache_dir,
-    'no-append' => sub { $append_prefix = 0; },
-    'append'    => sub { $append_prefix = 1; },
-    'rm'        => sub { $rm_existing = 1; },
-    'suffix=s'  => \$suffix,
-    'no-cpanm'  => sub { $perl_install_cpanm = 1; },
+              'prefix=s'  => \$install_prefix,
+              'no-yaml'   => sub { $install_yaml = 0; },
+              'no-ffi'    => sub { $install_ffi = 0; },
+              'ruby=s'    => \$lang_vm,
+              'version=s' => \$lang_version,
+              'cache=s'   => \$cache_dir,
+              'no-append' => sub { $append_prefix = 0; },
+              'append'    => sub { $append_prefix = 1; },
+              'rm'        => sub { $rm_existing = 1; },
+              'suffix=s'  => \$suffix,
+              'help' => sub { help(1); },
+              'h'    => sub { help(1); },
+            ) or help(1);
 
-    # yes this is wonky, its inverted for a later conditional
-    # it makes the if test more readable... ish
-    'no-test' => sub { $perl_run_tests = 0; },
-    'help'    => sub { help(1); },
-    'h'       => sub { help(1); },
-            )
-    or help(1);
-
+} elsif ( $script_language eq 'perl' ) {
   $help_message = <<FIN;
 usage:
 $0 --prefix=$install_prefix
@@ -185,6 +165,23 @@ $0 --prefix=$install_prefix
       Default: Append. Say prefix is /tmp/foo, with this on you would
                Install to /tmp/foo/perl-5.16.2 for example.
 FIN
+
+  GetOptions(
+    'prefix=s'  => \$install_prefix,
+    'version=s' => \$lang_version,
+    'cache=s'   => \$cache_dir,
+    'no-append' => sub { $append_prefix = 0; },
+    'append'    => sub { $append_prefix = 1; },
+    'rm'        => sub { $rm_existing = 1; },
+    'suffix=s'  => \$suffix,
+    'no-cpanm'  => sub { $perl_install_cpanm = 1; },
+
+    # yes this is wonky, its inverted for a later conditional
+    # it makes the if test more readable... ish
+    'no-test' => sub { $perl_run_tests = 0; },
+    'help'    => sub { help(1); },
+    'h'       => sub { help(1); },
+            ) or help(1);
 
 } else {
   say $script_language;
