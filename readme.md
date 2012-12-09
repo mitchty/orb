@@ -1,4 +1,4 @@
-# orb.sh, about the easiest way to pick a ruby interpreter
+# orb.sh, the opinionated ruby/perl chooser
 
 Why not rbenv?
 
@@ -8,23 +8,23 @@ Why not rvm?
 
 More complicated that it needs to be. I like simple.
 
-Why use this?
+Why not perlbrew?
 
-Its 60 lines of simple shell that uses select to adjust $PATH. Outside of typing export PATH=/foo/bar/baz/bin, this is about the most basic you can make it.
+About the same, plus this is all in one.
+
+Why use this instead?
+
+It's a few lines of semi-simple shell that modifies your running shells $PATH. Outside of typing export PATH=/foo/bar/baz/bin, this is about the most basic you can make it. Its also fast, no fork/execs just to get at your executable.
 
 # How do I use it?
 
-Don't like the default location of $HOME/.rubies as being the place for your rubies?
+Well assuming you've git cloned it to say $HOME its simple.
 
-export $orb_ruby_base=/some/dir/with/all/your/ruby/interpreters
+> . ${HOME}/orb/orb.sh
 
-Source it!
+Install a ruby using the handy dandy script there as well:
 
-. /path/to/orb.sh
-
-Install some form of ruby/jruby/rbx/python/perl as long as it has a /bin dir its all good.
-
-./configure --prefix=$orb_ruby_base/some_new_ruby
+> ${HOME}/orb/ruby-install
 
 ## interactively
 
@@ -49,13 +49,11 @@ note, picking system just removes any changes from $PATH.
 
 ## non-interactively muck with $PATH
 
-Assuming $orb_ruby_base has a directory named ruby-1.9.3-p194 within:
-
-setupruby ruby-1.9.3-p194
+orb_use_ruby 1.9.3-p327
 
 ## But I don't want that dir in $PATH anymore!
 
-No worries, typing orb_implode removes anything from $orb_ruby_base in $PATH.
+No worries, typing orb_implode removes everything it sets up.
 
 Thats it!
 
