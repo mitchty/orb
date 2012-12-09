@@ -65,15 +65,6 @@ my $install_prefix = $default_prefix;
 my $cache_dir      = ( defined $orb_cache ) ? $orb_cache : "$base_prefix/cache";
 my $log_dir        = ( defined $orb_logs ) ? $orb_logs : "$cache_dir\/logs";
 
-#say $base_prefix;
-#say $default_prefix;
-#say $install_prefix;
-#say $cache_dir;
-#say $log_dir;
-
-### no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-#sleep 10;
-
 # handle orb_{ruby|perl|python}_base env variables.
 if ( $script_language eq 'ruby' ) {
   $install_prefix =
