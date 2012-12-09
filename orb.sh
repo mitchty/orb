@@ -1,24 +1,23 @@
 #!/bin/sh
 #-*-mode: Shell-script; coding: utf-8;-*-
+
+# Default locations for things.
 orb_base=${orb_base:=$HOME/.orb}
+orb_cache=${orb_cache:=$orb_base/cache}
+orb_logs=${orb_cache:=$orb_cache/logs}
 orb_ruby_base=${orb_ruby_base:=$orb_base/rubies}
 orb_perl_base=${orb_perl_base:=$orb_base/perls}
 orb_python_base=${orb_python_base:=$orb_base/pythons}
 
 ORB_VERBOSE=${ORB_VERBOSE:=N}
 
-function orb_ls_path {
-  echo $PATH | sed -e 's/\:/ /g' | fmt -1
-}
+function orb_ls_path { echo $PATH | sed -e 's/\:/ /g' | fmt -1 }
 
 function orb_to_path {
   cat /dev/stdin | awk '!a[$0]++' | tr -s '\n' ':' | sed -e 's/\:$//'
 }
 
-function orb_shift_path {
-  [[ -d "$1" ]] && echo $1
-  orb_ls_path
-}
+function orb_shift_path { [[ -d "$1" ]] && echo $1; orb_ls_path }
 
 function orb_rm_path {
   tmp=$(orb_ls_path | grep -v $1 | orb_to_path)
@@ -33,142 +32,141 @@ function orb_add_path {
 }
 
 function orb_implode {
-  orb_implode_ruby
-  orb_implode_perl
-  orb_implode_python
-  orb_implode_all
+  orb_implode_ruby; orb_implode_perl; orb_implode_python
+  unset orb; unset opl; unset opy
+  for var in $(set | egrep -a "^(orb|ORB)_" | awk -F= '{print $1}'); do
+    unset $var
+  done
+  for func in $(typeset -f | egrep '^orb_'| awk '{print $1}'); do
+    unset -f $func
+  done
 }
 
-# unset everything we've done
-function orb_implode_all {
-  unset orb_ls_path
-  unset orb_to_path
-  unset orb_shift_path
-  unset orb_rm_path
-  unset orb_add_path
-  unset orb_add_bin
-  unset orb_use_ruby
-  unset orb_use_perl
-  unset orb_use_python
-  unset orb_echo
-  unset orb_pick
-  unset orb_implode_ruby
-  unset orb_implode_perl
-  unset orb_implode_python
-  unset orb
-  unset opl
-  unset opy
-  unset orb_implode
-  unset ORB_VERBOSE
-  unset orb_base
-  unset orb_ruby_base
-  unset orb_perl_base
-  unset orb_python_base
-  unset orb_implode_all
-}
-
-function orb_implode_ruby {
-  orb_rm_path $orb_ruby_base
-}
-
-function orb_implode_perl {
-  orb_rm_path $orb_perl_base
-}
-
-function orb_implode_python {
-  orb_rm_path $orb_python_base
-}
+function orb_implode_ruby { orb_rm_path $orb_ruby_base }
+function orb_implode_perl { orb_rm_path $orb_perl_base }
+function orb_implode_python { orb_rm_path $orb_python_base }
 
 function orb_add_bin {
-  has_bin="$1/bin"
-  if [[ -d $has_bin ]]; then
-    orb_add_path $has_bin
+  dir=$1; shift; lang=$1
+
+  bin="$dir/bin/$lang"
+  if [[ -f $bin ]]; then
+    orb_add_path "$dir/bin"
   else
-    orb_echo "$has_bin not found!"
+    orb_echo "$bin not found!"
     return 1
   fi
 }
 
-function orb_use_ruby {
-  orb_implode_ruby
-  orb_add_bin "$orb_ruby_base/$1"
+function orb_rm_vm {
+  name=$1; shift; lang=$1
+  echo $name | grep 'system' > /dev/null 2>&1
+  if [[ $? -eq 0 ]]; then
+    echo "I can't remove the system ${lang} install, sorry"
+    return
+  fi
+  dir=$(eval "orb_${lang}_basedir")
+  bin="$dir/$name/bin/$lang"
+  [[ -f $bin ]] && rm -fr "$dir/$name"
 }
 
-function orb_use_perl {
-  orb_implode_perl
-  orb_add_bin "$orb_perl_base/$1"
+function orb_use_internal {
+  lang=$1; shift; name=$1
+  eval "orb_implode_$lang"
+  echo $name | grep 'system' > /dev/null 2>&1
+  if [[ $? -eq 0 ]]; then
+    return
+  else
+    base=$(eval "orb_${lang}_basedir")
+    eval "orb_add_bin '$base/$name' '$lang'"
+  fi
 }
 
-function orb_use_python {
-  orb_implode_python
-  orb_add_bin "$orb_python_base/$1"
-}
+function orb_use_ruby { orb_use_internal 'ruby' $1 }
+function orb_use_perl { orb_use_internal 'perl' $1 }
+function orb_use_python { orb_use_internal 'python' $1 }
+function orb_echo { [[ ${ORB_VERBOSE} != 'N' ]] && echo $* }
 
-function orb_echo {
-  [[ ${ORB_VERBOSE} != 'N' ]] && echo $*
+# conveniences for eval
+function orb_ruby_basedir { echo $orb_ruby_base }
+function orb_perl_basedir { echo $orb_perl_base }
+function orb_python_basedir { echo $orb_python_base }
+
+function orb_ls_internal {
+  lang=$1
+  echo $(cd $(eval "orb_${lang}_basedir") &&
+         echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
 }
 
 function orb_pick {
   lang=$1
   tmp=$PS3
   PS3="$lang?: "
-  base="orb_${lang}_base"
-  cd_dir=$(eval "echo \$$base")
-  select option in $(cd $cd_dir && echo "system " * | fmt -1 | grep -v '^\.' | fmt -1000); do
+  base=$(eval eval echo "\$orb_${lang}_base")
+  IFS=" "
+  select option in $(orb_ls_internal $lang); do
     if [[ -n $option ]]; then
-      PS3=$tmp
-      # workaround for osx zsh select
-      echo $option | grep 'system' > /dev/null 2>&1
-      if [[ $? -eq 0 ]]; then
-        orb_echo "Removing $cd_dir from \$PATH"
-        eval "orb_implode_${lang}"
-        break
-      fi
-      orb_echo "Adding ${cd_dir}/$option/bin to \$PATH"
-      eval "orb_use_${lang} $option"
+      orb_use_internal 'ruby' $option
       break
     else
       echo "Invalid selection $option"
     fi
   done
+  PS3=$tmp
 }
 
 function orb_pick_private {
-  lang=$1
-  shift
+  lang=$1; shift
+  action=unknown
   do_index=0
+  use_all=1
+
   for param in $*; do
-    [ "$param" = 'do' ] && break
+    [[ $param = 'all' ]] && use_all=0
+    if [[ $param = 'do' || $param = 'ls' || $param = 'rm' ]]; then
+      action=$param; break
+    fi
     (( do_index=do_index+1 ))
   done
 
-  if [[ $do_index != 0 ]]; then
-    index=0
-    typeset -a vm
-    until [ $index -eq $do_index ]; do
-      (( index=index+1 ))
-      vm[$index]=$1
+  if [[ $action = 'do' ]]; then
+    if [[ $use_all -eq 0 ]]; then
+      shift; shift
+      for a in $(orb_ls_internal $lang); do
+        orb_use_internal $lang $a
+        orb_echo $(which $lang)
+        eval $*
+      done
+    else
+      index=0
+      typeset -a vm
+      until [ $index -eq $do_index ]; do
+        (( index=index+1 ))
+        vm[$index]=$1
+        shift
+      done
       shift
+      for a in ${vm[@]}; do
+        eval "orb_use_${lang} $a"
+        orb_echo $(which $lang)
+        eval $*
+      done
+    fi
+  elif [[ $action = 'rm' ]]; then
+    index=0
+    until [ $index -eq $do_index ]; do
+      (( index=index+1 )); shift
+    done; shift
+    for a in $*; do
+      orb_rm_vm $a $lang
     done
-    shift
-    for a in ${vm[@]}; do
-      eval "orb_use_${lang} $a"
-      orb_echo $(which $lang)
-      eval $*
-    done
+  elif [[ $action = 'ls' ]]; then
+    orb_ls_internal $lang
   else
     orb_pick $lang
   fi
 }
 
-function orb {
-  orb_pick_private 'ruby' $*
-}
-
-function opl {
-  orb_pick_private 'perl' $*
-}
-
-function opy {
-  orb_pick_private 'python' $*
-}
+function orb { orb_pick_private 'ruby' $* }
+function opl { orb_pick_private 'perl' $* }
+function opy { orb_pick_private 'python' $* }
