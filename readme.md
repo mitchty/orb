@@ -1,5 +1,7 @@
 # orb.sh, the opinionated ruby/perl chooser
 
+Consider this a work in progress at best until I finish writing tests for everything. Proof of concept basically. It "works" for varying definitions of work.
+
 Why not rbenv?
 
 I don't like shims that are shell wrappers, and no need to exec a shell just to exec ruby.
