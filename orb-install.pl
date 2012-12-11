@@ -593,7 +593,7 @@ sub install_jruby {
     $extract_dir =~ s/[-]bin//sm;
     my $filename = "$cache_dir/$file";
     fetch_url($url);
-    $dir = extract_tgz("$cache_dir\/$filename");
+    $dir = extract_tgz($filename);
 
     log_cmd "mv $extract_dir $install_prefix";
   } else {

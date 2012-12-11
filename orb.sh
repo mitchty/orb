@@ -4,7 +4,7 @@
 # Default locations for things.
 orb_base=${orb_base:=$HOME/.orb}
 orb_cache=${orb_cache:=$orb_base/cache}
-orb_logs=${orb_cache:=$orb_cache/logs}
+orb_logs=${orb_logs:=$orb_cache/logs}
 orb_ruby_base=${orb_ruby_base:=$orb_base/rubies}
 orb_perl_base=${orb_perl_base:=$orb_base/perls}
 orb_python_base=${orb_python_base:=$orb_base/pythons}
