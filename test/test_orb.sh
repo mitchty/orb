@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 #-*-mode: Shell-script; coding: utf-8;-*-
+echo "Running $(basename $0)"
 
 # Try and make sure what we've written functions sanely.
 it_passes_ksh_shell_checks_ok() {

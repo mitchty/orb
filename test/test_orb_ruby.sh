@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 #-*-mode: Shell-script; coding: utf-8;-*-
+echo "Running $(basename $0)"
 
 it_should_use_system_ruby_by_default_if_present() {
   set +e
