@@ -24,7 +24,6 @@ use Getopt::Long;
 use Env
   qw(HOME LDFLAGS CPPFLAGS TMPDIR orb_base orb_cache orb_logs orb_ruby_base orb_perl_base orb_python_base);
 use POSIX qw(getcwd);
-use File::Path qw(make_path);
 use File::Basename qw(dirname basename);
 use File::Temp qw(tempdir);
 
@@ -226,7 +225,7 @@ FIN
 # $log_dir/$lang_vm-$lang_version.log
 sub log_cmd {
   my $cmd = shift;
-  make_path $log_dir unless ( -d $log_dir );
+  system("mkdir -p $log_dir") unless ( -d $log_dir );
 
   my $logfile = "$log_dir\/$lang_vm-$lang_version\.log";
   say $cmd;
@@ -300,16 +299,13 @@ sub full_vm_version {
 }
 
 sub sanity_check {
-  my $insane = 0;
   qx{curl -V};
-  $insane = $insane ^ $?;
-  warn 'Oh snap! Didn\'t find a working curl install.' if $?;
+  warn "curl may not be installed, curl -V didn't return 0" if ($? >> 8);
   qx{git --version};
-  $insane = $insane ^ $?;
-  warn 'Oh snap! Didn\'t find a working git install.' if $?;
+  warn "git may not be installed git --version didn't return 0" if ($? >> 8);
 
   unless ( -d $cache_dir ) {
-    make_path $cache_dir or die "Cannot create $cache_dir!\n";
+    qx/mkdir -p $cache_dir/ or die "Cannot create $cache_dir!\n";
   }
 
   $File::Temp::DEBUG = !$debug_flag;
@@ -329,8 +325,10 @@ sub sanity_check {
     }
   }
 
+  qx/mkdir -p $install_prefix/ unless( -d $install_prefix);
   say "Installing to $install_prefix";
-  return $insane;
+
+  return 0;
 }
 
 sub curl_get {
