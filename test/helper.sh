@@ -11,9 +11,9 @@ setUp() {
   fi
   mkdir sandbox
   cd sandbox
-  cp ../../../*.sh .
-  cp ../../../*.pl .
-  cp ../../../*-install .
+  cp ../../*.sh .
+  cp ../../*.pl .
+  cp ../../*-install .
 }
 
 suite() {
