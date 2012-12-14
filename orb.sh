@@ -110,7 +110,7 @@ orb_use_internal()
   else
     eval "orb_implode_$lang"
     base=$(eval "orb_${lang}_basedir")
-    eval "orb_add_bin $base/$name $lang"
+    orb_add_bin $base/$name $lang
   fi
 }
 
