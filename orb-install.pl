@@ -305,7 +305,8 @@ sub sanity_check {
   warn "git may not be installed git --version didn't return 0" if ($? >> 8);
 
   unless ( -d $cache_dir ) {
-    qx/mkdir -p $cache_dir/ or die "Cannot create $cache_dir!\n";
+    qx/mkdir -p $cache_dir/;
+    warn "Cannot create $cache_dir\n" if ($? >> 8);
   }
 
   $File::Temp::DEBUG = !$debug_flag;
@@ -315,6 +316,10 @@ sub sanity_check {
   $append_prefix = 0 if ( $default_prefix ne $install_prefix );
 
   if ($append_prefix) {
+    unless ( -d $install_prefix ){
+      my $rc = log_cmd "mkdir -p $install_prefix";
+      die "mkdir on $install_prefix failed\n" if ($? >> 8);
+    }
     $install_prefix = "$install_prefix/$lang_vm-$lang_version";
     if ($suffix) {
       $install_prefix = "$install_prefix" . "\%$suffix";
@@ -325,7 +330,6 @@ sub sanity_check {
     }
   }
 
-  qx/mkdir -p $install_prefix/ unless( -d $install_prefix);
   say "Installing to $install_prefix";
 
   return 0;
