@@ -184,7 +184,7 @@ orb_pick_private()
 
   for param in $*; do
     [[ $param == 'all' ]] && use_all=0
-    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' ]]; then
+    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' || $param == 'use' ]]; then
       action=$param; break
     fi
     (( do_index=do_index+1 ))
@@ -221,6 +221,12 @@ orb_pick_private()
     for a in $*; do
       orb_rm_vm $a $lang
     done
+  elif [[ $action == 'use' ]]; then
+    index=0
+    until [ $index -eq $do_index ]; do
+      (( index=index+1 )); shift
+    done; shift
+    orb_use_internal $lang $*
   elif [[ $action == 'ls' ]]; then
     orb_ls_internal $lang
   else
