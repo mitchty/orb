@@ -7,7 +7,7 @@ it_should_use_system_python_by_default_if_present() {
   if [[ -f "$(which python)" ]]; then
     system_python=$(which python)
     . ./orb.sh
-    orb_use_python system
+    opy use system
     orb_python=$(which python)
     assertEquals "${system_python}" "${orb_python}"
     orb_implode
@@ -34,7 +34,7 @@ it_should_use_python_installs_to_orb_python_base() {
   . ./orb.sh
   mock_python=$orb_python_base/default/bin/python
   mock_install $mock_python
-  orb_use_python default
+  opy use default
   assertEquals "${mock_python}" "$(which python)"
   orb_implode
 }
@@ -46,7 +46,7 @@ it_should_not_use_directories_in_orb_base_with_no_python_bin() {
   . ./orb.sh
   mkdir -p $orb_base/default/bin
   touch $orb_base/default/bin/zomg
-  orb_use_python default
+  opy use default
   assertEquals "${system_python}" "$(which python)"
   orb_implode
 }
@@ -58,7 +58,7 @@ it_should_not_use_nonexecutable_python_in_orb_base() {
   . ./orb.sh
   mkdir -p $orb_base/default/bin
   touch $orb_base/default/bin/python
-  orb_use_python default
+  opy use default
   assertEquals "${system_python}" "$(which python)"
   orb_implode
 }
