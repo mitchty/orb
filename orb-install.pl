@@ -499,7 +499,7 @@ sub install_ruby {
 
   my $dir = q{};
   my $configure =
-"--prefix=$install_prefix --disable-tk --disable-tcl --disable-install-doc --enable-pthread --with-opt-dir=$install_prefix --with-static-linked-ext --disable-tcltk";
+"--prefix=$install_prefix --with-opt-dir=$install_prefix --with-out-ext=tcl --with-out-ext=tk";
 
   if ( $lang_version ne 'head' ) {
     my $url  = rubyurl("$lang_version");
@@ -523,8 +523,6 @@ sub install_ruby {
 
   if ( $^O eq 'darwin' ) {
     $configure = "CC='clang' $configure";
-
-    #      $configure = "CC='clang -Qunused-arguments' $configure";
   }
 
   configure_dir( $dir, "$configure" );

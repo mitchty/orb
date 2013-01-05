@@ -51,7 +51,7 @@ note, picking system just removes any changes from $PATH.
 
 ## non-interactively muck with $PATH
 
-orb_use_ruby 1.9.3-p327
+orb use 1.9.3-p327
 
 ## But I don't want that dir in $PATH anymore!
 
