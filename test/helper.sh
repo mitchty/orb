@@ -11,6 +11,9 @@ setUp() {
   fi
   mkdir sandbox
   cd sandbox
+  # copy .orb/cache if it exists and we're running under the sandbox tests
+  user_orb_cache=${HOME}/.orb/cache
+  [[ -d $user_orb_cache && "$copy_cache" == 'y' ]] && cp -R $user_orb_cache cache
   cp ../../*.sh .
   cp ../../*.pl .
   cp ../../*-install .
