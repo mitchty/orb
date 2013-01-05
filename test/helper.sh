@@ -14,6 +14,8 @@ setUp() {
   cp ../../*.sh .
   cp ../../*.pl .
   cp ../../*-install .
+  cp ../*.rb .
+  cp ../versions .
 }
 
 suite() {
