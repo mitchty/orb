@@ -5,7 +5,7 @@ echo "Running $(basename $0)"
 it_installs_latest_jruby() {
   set +e
   engine=jruby
-  engine_version=1.7.1
+  engine_version=1.7.2
   orb_base=$(pwd)
   export orb_base
   source ./orb.sh
@@ -15,7 +15,7 @@ it_installs_latest_jruby() {
   ruby_ver_string=$(ruby -v | perl -pe 's/\son.*//g;')
   set -e
   assertEquals "$sandbox_ruby" "$(which ruby)"
-  assertEquals 'jruby 1.7.1 (1.9.3p327) 2012-12-03 30a153b' "$ruby_ver_string"
+  assertEquals 'jruby 1.7.2 (1.9.3p327) 2013-01-04 302c706' "$ruby_ver_string"
 }
 
 . ./helper.sh
