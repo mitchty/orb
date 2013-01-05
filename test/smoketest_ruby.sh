@@ -10,7 +10,7 @@ it_installs_latest_ruby() {
   export orb_base
   source ./orb.sh
   ./ruby-install > /dev/null 2>&1
-  orb_use_ruby ${engine}-${engine_version}
+  orb use ${engine}-${engine_version}
   sandbox_ruby=$orb_ruby_base/${engine}-${engine_version}/bin/ruby
   ruby_ver_string=$(ruby -v | perl -pe 's/\s\[.*$//g')
   set -e

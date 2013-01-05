@@ -10,7 +10,7 @@ it_installs_latest_perl() {
   export orb_base
   source ./orb.sh
   ./perl-install --no-test --version=${engine_version} > /dev/null 2>&1
-  orb_use_perl ${engine}-${engine_version}
+  opl use ${engine}-${engine_version}
   sandbox_perl=$orb_perl_base/${engine}-${engine_version}/bin/perl
   perl_ver_string=$(perl -v | perl -pe 's/\sbuilt\sfor\s.*//g;')
   set -e
