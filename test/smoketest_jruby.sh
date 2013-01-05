@@ -3,7 +3,7 @@
 echo "Running $(basename $0)"
 
 copy_cache=y
-export $copy_cache
+export copy_cache
 
 it_installs_latest_jruby() {
   set +e
