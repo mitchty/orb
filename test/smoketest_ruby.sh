@@ -2,6 +2,9 @@
 #-*-mode: Shell-script; coding: utf-8;-*-
 echo "Running $(basename $0)"
 
+copy_cache=y
+export $copy_cache
+
 it_installs_latest_ruby() {
   set +e
   engine=ruby
