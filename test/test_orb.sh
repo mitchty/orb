@@ -53,4 +53,26 @@ it_really_leaves_no_functions_behind() {
   assertEquals 0 $func_count
 }
 
+it_modifies_path_properly() {
+  set +e
+  path_prior=$PATH
+  if [[ -f "$(which ruby)" ]]; then
+    system_ruby=$(which ruby)
+    orb_base=$(pwd)
+    export orb_base
+    . ./orb.sh
+    mock_ruby=$orb_ruby_base/default/bin/ruby
+    mock_install "$orb_ruby_base/default/ruby"
+    orb use default
+    orb use system
+    orb_ruby=$(which ruby)
+    assertEquals $path_prior $PATH
+    assertEquals $system_ruby $orb_ruby
+    orb_implode
+  else
+    echo "Warning: no system ruby found."
+    assertEquals 0 0
+  fi
+}
+
 . ./helper.sh
