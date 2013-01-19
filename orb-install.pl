@@ -602,7 +602,7 @@ sub install_jruby {
     build_with( 'ant', $dir, 'dist' );
     chdir "$dir\/dist";
 
-    my $distfile      = glob('jruby-bin*tar.gz');
+    my $distfile      = defined(glob('jruby-bin*tar.gz')) or die "No distfile found\n";
     my $distfile_full = "$dir/dist/" . $distfile;
 
     if ( -f $distfile ) {
