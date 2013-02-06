@@ -8,7 +8,7 @@ export copy_cache
 it_installs_latest_ruby() {
   set +e
   engine=ruby
-  engine_version=1.9.3-p374
+  engine_version=1.9.3-p385
   orb_base=$(pwd)
   export orb_base
   source ./orb.sh
@@ -18,7 +18,7 @@ it_installs_latest_ruby() {
   ruby_ver_string=$(ruby -v | perl -pe 's/\s\[.*$//g')
   set -e
   assertEquals "$sandbox_ruby" "$(which ruby)"
-  assertEquals 'ruby 1.9.3p374 (2013-01-15 revision 38858)' "$ruby_ver_string"
+  assertEquals 'ruby 1.9.3p385 (2013-02-06 revision 39114)' "$ruby_ver_string"
 }
 
 . ./helper.sh
