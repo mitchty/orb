@@ -106,7 +106,7 @@ orb_use_internal()
   lang=$1; shift; name=$1
   echo $name | grep 'system' > /dev/null 2>&1
   if (( $? == 0 )); then
-    return
+    eval "orb_implode_$lang"
   else
     eval "orb_implode_$lang"
     base=$(eval "orb_${lang}_basedir")
@@ -208,7 +208,7 @@ orb_pick_private()
       done
       shift
       for a in ${vm[@]}; do
-        eval "orb_use_${lang} $a"
+        orb_use_internal $lang $a
         orb_echo $(which $lang)
         eval $*
       done

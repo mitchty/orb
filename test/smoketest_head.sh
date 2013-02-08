@@ -3,6 +3,6 @@
 
 ./test_all.sh
 
-for smoke in $(ls -d smoketest_*.sh | grep -v all | grep -v head); do
+for smoke in $(ls -d smoketest_head_*.sh); do
   (./$smoke)
 done
