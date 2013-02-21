@@ -11,6 +11,8 @@ it_detects_latest_versions() {
   # Meh, use jruby as its faster to install WHY NOT
   ./ruby-install --ruby=jruby --prefix=$orb_ruby_base/default > /dev/null 2>&1
   orb use default
+  GEM_HOME=${orb_base}
+  export GEM_HOME
   gem install nokogiri
   set -e
   ruby latest-versions.rb > versions-new

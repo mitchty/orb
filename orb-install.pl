@@ -96,7 +96,7 @@ my $perl_run_tests     = 1;
 # language vm defaults
 my %lang_defaults = (
                       'ruby'  => '1.9.3-p385',
-                      'jruby' => '1.7.2',
+                      'jruby' => '1.7.3',
                       'rbx'   => 'head',
                       'perl'  => '5.16.2',
                     );
