@@ -95,7 +95,7 @@ my $perl_run_tests     = 1;
 
 # language vm defaults
 my %lang_defaults = (
-                      'ruby'  => '1.9.3-p385',
+                      'ruby'  => '1.9.3-p392',
                       'jruby' => '1.7.3',
                       'rbx'   => 'head',
                       'perl'  => '5.16.2',
@@ -519,10 +519,6 @@ sub install_ruby {
 
     chdir $dir;
     log_cmd 'autoconf';
-  }
-
-  if ( $^O eq 'darwin' ) {
-    $configure = "CC='clang' $configure";
   }
 
   configure_dir( $dir, "$configure" );
