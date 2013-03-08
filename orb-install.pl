@@ -216,8 +216,15 @@ FIN
     or help(1);
 
 } else {
-  say $script_language;
-  say "no idea what is being asked, was called as \"$script_name\"";
+  say "call me as ruby-install or perl-install to install ruby or perl.";
+
+  say "latest known vm versions";
+  say "engine: version";
+
+  foreach my $engine (keys(%lang_defaults)) {
+    my $version = $lang_defaults{$engine};
+    say "$engine: $version";
+  }
   exit 1;
 }
 
