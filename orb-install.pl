@@ -641,7 +641,7 @@ sub perl_finalize {
     unless ($perl_install_cpanm) {
       say "Setting up cpanm for $perl_install";
       my $cpanm_install_cmd =
-        "curl --silent --location http://cpanmin.us | $perl_bin - App::cpanminus";
+        "curl -# --location http://cpanmin.us | $perl_bin - App::cpanminus";
       log_cmd $cpanm_install_cmd;
     }
   }
