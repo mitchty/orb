@@ -216,8 +216,15 @@ FIN
     or help(1);
 
 } else {
-  say $script_language;
-  say "no idea what is being asked, was called as \"$script_name\"";
+  say "call me as ruby-install or perl-install to install ruby or perl.";
+
+  say "latest known vm versions";
+  say "engine: version";
+
+  foreach my $engine (keys(%lang_defaults)) {
+    my $version = $lang_defaults{$engine};
+    say "$engine: $version";
+  }
   exit 1;
 }
 
@@ -641,7 +648,7 @@ sub perl_finalize {
     unless ($perl_install_cpanm) {
       say "Setting up cpanm for $perl_install";
       my $cpanm_install_cmd =
-        "curl --silent --location http://cpanmin.us | $perl_bin - App::cpanminus";
+        "curl -# --location http://cpanmin.us | $perl_bin - App::cpanminus";
       log_cmd $cpanm_install_cmd;
     }
   }
