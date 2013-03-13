@@ -98,7 +98,7 @@ my %lang_defaults = (
                       'ruby'  => '2.0.0-p0',
                       'jruby' => '1.7.3',
                       'rbx'   => 'head',
-                      'perl'  => '5.16.2',
+                      'perl'  => '5.16.3',
                     );
 
 my $help_message = 'default help message';

@@ -8,7 +8,7 @@ export copy_cache
 it_installs_latest_perl() {
   set +e
   engine=perl
-  engine_version=5.16.2
+  engine_version=5.16.3
   orb_base=$(pwd)
   export orb_base
   source ./orb.sh
@@ -19,7 +19,7 @@ it_installs_latest_perl() {
   set -e
   basic_version_out=$(cat <<EOF
 
-This is perl 5, version 16, subversion 2 (v5.16.2)
+This is perl 5, version 16, subversion 3 (v5.16.3)
 
 Copyright 1987-2012, Larry Wall
 
