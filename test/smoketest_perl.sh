@@ -8,7 +8,7 @@ export copy_cache
 it_installs_latest_perl() {
   set +e
   engine=perl
-  engine_version=5.16.3
+  engine_version=5.18.0
   orb_base=$(pwd)
   export orb_base
   source ./orb.sh
@@ -19,9 +19,9 @@ it_installs_latest_perl() {
   set -e
   basic_version_out=$(cat <<EOF
 
-This is perl 5, version 16, subversion 3 (v5.16.3)
+This is perl 5, version 18, subversion 0 (v5.18.0)
 
-Copyright 1987-2012, Larry Wall
+Copyright 1987-2013, Larry Wall
 
 Perl may be copied only under the terms of either the Artistic License or the
 GNU General Public License, which may be found in the Perl 5 source kit.
