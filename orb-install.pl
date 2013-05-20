@@ -95,10 +95,10 @@ my $perl_run_tests     = 1;
 
 # language vm defaults
 my %lang_defaults = (
-                      'ruby'  => '2.0.0-p0',
-                      'jruby' => '1.7.3',
+                      'ruby'  => '2.0.0-p195',
+                      'jruby' => '1.7.4',
                       'rbx'   => 'head',
-                      'perl'  => '5.16.3',
+                      'perl'  => '5.18.0',
                     );
 
 my $help_message = 'default help message';
