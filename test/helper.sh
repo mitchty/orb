@@ -19,6 +19,8 @@ setUp() {
   cp ../../*-install .
   cp ../*.rb .
   cp ../versions .
+  cp ../versions.sh .
+  eval $($(pwd)/versions.sh)
 }
 
 suite() {
