@@ -554,7 +554,7 @@ sub install_rbx {
   my $dirname = 'rbx-git';
   my $fulldir = "$cache_dir\/$dirname";
   my $configure =
-"--prefix=$install_prefix --default-version=19 --with-include-dir=$install_prefix/include --with-lib-dir=$install_prefix/lib";
+"--prefix=$install_prefix --with-include-dir=$install_prefix/include --with-lib-dir=$install_prefix/lib";
 
   my $dir = fetch_git( 'https://github.com/rubinius/rubinius', $dirname );
   my $prebuilt_dir = "$fulldir\/vendor\/prebuilt";
