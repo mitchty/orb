@@ -215,7 +215,7 @@ orb_pick_private()
 
   for param in $*; do
     [[ $param == 'all' ]] && use_all=0
-    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' || $param == 'use' ]]; then
+    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' || $param == 'use' || $param == 'implode' ]]; then
       action=$param; break
     fi
     (( do_index=do_index+1 ))
