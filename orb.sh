@@ -17,22 +17,39 @@ ORB_VERBOSE=${ORB_VERBOSE:=N}
 # blah
 # }
 # is a syntax error. This is the reason shell programming is like trying to
-# fight in a boxing match with both arms chopped off. Just a flesh wound.or
+# fight in a boxing match with both arms chopped off. Just a flesh wound.
+
+# ls_path treats PATH as if it were a newline delimited file
+#
+# Its more "shelly" (jelly? whatever) to just use sed/awk/tr/fmt on things.
 orb_ls_path()
 {
   echo $PATH | sed -e 's/\:/ /g' | fmt -1
 }
 
+# (ab)use awk to take whatever path (^ls_path output really) and convert
+# to a : delimited string.
+#
+# Note one side effect of that hokey awk-ism there, is that duplicate
+# lines are ignored, first one wins always. So this isn't perfect, but
+# it is deliberate. This is exactly how the shell would treat things.
+#
+# Though it is questionable/arguable I shouldn't be doing the deduplication
+# at all. Maybe I'll change it, honestly I don't care about removing duplicate
+# paths that much.
 orb_to_path()
 {
   cat /dev/stdin | awk '!a[$0]++' | tr -s '\n' ':' | sed -e 's/\:$//'
 }
 
+# shift a path directory onto the path "stack" if you will.
+# nop if not a directory
 orb_shift_path()
 {
   [[ -d "$1" ]] && echo $1; orb_ls_path
 }
 
+# Remove a path line from the path "stack"
 orb_rm_path()
 {
   tmp=$(orb_ls_path | grep -v $1 | orb_to_path)
@@ -40,6 +57,7 @@ orb_rm_path()
   eval "export PATH"
 }
 
+# Update add to $PATH, maybe call rehash when in zsh here?
 orb_add_path()
 {
   tmp=$(orb_shift_path "$1" | orb_to_path)
@@ -47,6 +65,8 @@ orb_add_path()
   eval "export PATH"
 }
 
+# Cleanup after ourselves for whatever reason, remove ruby/perl/python
+# then cleanup env/variables.
 orb_implode()
 {
   orb_implode_ruby; orb_implode_perl; orb_implode_python
@@ -59,21 +79,25 @@ orb_implode()
   done
 }
 
+# nuke ruby paths
 orb_implode_ruby()
 {
   orb_rm_path $orb_ruby_base
 }
 
+# ditto perl
 orb_implode_perl()
 {
   orb_rm_path $orb_perl_base
 }
 
+# ditto python
 orb_implode_python()
 {
   orb_rm_path $orb_python_base
 }
 
+# For being lazy, add the /bin dir for a prefix if it exists for $lang
 orb_add_bin()
 {
   dir=$1; shift; lang=$1
@@ -88,6 +112,7 @@ orb_add_bin()
   fi
 }
 
+# Remove an orb/opl/opy managed install.
 orb_rm_vm()
 {
   name=$1; shift; lang=$1
@@ -101,6 +126,8 @@ orb_rm_vm()
   [[ -f $bin ]] && rm -fr "$dir/$name"
 }
 
+# Nuke any orb/opl/opy $lang directory from $PATH
+# then add in the requested named $lang intepreter
 orb_use_internal()
 {
   lang=$1; shift; name=$1
@@ -114,21 +141,25 @@ orb_use_internal()
   fi
 }
 
+# lazy wrapper for using a ruby interpreter
 orb_use_ruby()
 {
   orb_use_internal 'ruby' $1
 }
 
+# ditto perl
 orb_use_perl()
 {
   orb_use_internal 'perl' $1
 }
 
+# ditto python
 orb_use_python()
 {
   orb_use_internal 'python' $1
 }
 
+# Be verbose when $ORB_VERBOSE is set, otherwise ne'er a squeek
 orb_echo()
 {
   [[ ${ORB_VERBOSE} != 'N' ]] && echo $*
