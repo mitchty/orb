@@ -270,6 +270,8 @@ orb()
   orb_pick_private 'ruby' $*
 }
 
+  elif [[ $action == 'implode' ]]; then
+    orb_implode
 opl()
 {
   orb_pick_private 'perl' $*
