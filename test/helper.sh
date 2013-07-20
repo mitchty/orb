@@ -2,7 +2,8 @@
 #-*-mode: Shell-script; coding: utf-8;-*-
 set -e
 
-setUp() {
+setUp()
+{
   if [[ $(pwd) == *sandbox ]]; then
     cd ..
   fi
@@ -17,19 +18,23 @@ setUp() {
   cp ../../*.sh .
   cp ../../*.pl .
   cp ../../*-install .
+  cp ../../web-versions .
+  cp -r ../../Orb .
   cp ../*.rb .
   cp ../versions .
   cp ../versions.sh .
   eval $($(pwd)/versions.sh)
 }
 
-suite() {
+suite()
+{
   for test_name in $(grep '^it_' $0 | cut -d '(' -f 1); do
     suite_addTest $test_name
   done
 }
 
-mock_install() {
+mock_install()
+{
   input=$1
   file=$(basename "$input")
   dirs=$(dirname "$input")
