@@ -20,7 +20,6 @@ setUp()
   cp ../../*-install .
   cp ../../web-versions .
   cp -r ../../Orb .
-  cp ../*.rb .
   cp ../versions .
   cp ../versions.sh .
   eval $($(pwd)/versions.sh)
