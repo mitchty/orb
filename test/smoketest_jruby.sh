@@ -23,4 +23,4 @@ it_installs_latest_jruby() {
 
 . ./helper.sh
 
-orb_implode
+orb implode

@@ -10,7 +10,8 @@ it_should_use_system_ruby_by_default_if_present() {
     orb use system
     orb_ruby=$(which ruby)
     assertEquals "${system_ruby}" "${orb_ruby}"
-    orb_implode
+    assertEquals "system" $(orb which)
+    orb implode
   else
     echo "Warning: no system ruby found."
     assertEquals 0 0
@@ -25,7 +26,8 @@ it_should_detect_ruby_installs_to_orb_ruby_base() {
   mock_ruby=$orb_ruby_base/default/bin/ruby
   mock_install "$orb_ruby_base/default/ruby"
   assertEquals "$(orb ls)" "system default"
-  orb_implode
+  assertEquals "system" $(orb which)
+  orb implode
 }
 
 it_should_use_ruby_installs_to_orb_ruby_base() {
@@ -36,7 +38,8 @@ it_should_use_ruby_installs_to_orb_ruby_base() {
   mock_install $mock_ruby
   orb use default
   assertEquals "${mock_ruby}" "$(which ruby)"
-  orb_implode
+  assertEquals "default" $(orb which)
+  orb implode
 }
 
 it_should_not_use_directories_in_orb_base_with_no_ruby_bin() {
@@ -48,7 +51,8 @@ it_should_not_use_directories_in_orb_base_with_no_ruby_bin() {
   touch $orb_base/default/bin/zomg
   orb use default
   assertEquals "${system_ruby}" "$(which ruby)"
-  orb_implode
+  assertEquals "system" $(orb which)
+  orb implode
 }
 
 it_should_not_use_nonexecutable_ruby_in_orb_base() {
@@ -60,7 +64,8 @@ it_should_not_use_nonexecutable_ruby_in_orb_base() {
   touch $orb_base/default/bin/ruby
   orb use default
   assertEquals "${system_ruby}" "$(which ruby)"
-  orb_implode
+  assertEquals "system" $(orb which)
+  orb implode
 }
 
 . ./helper.sh

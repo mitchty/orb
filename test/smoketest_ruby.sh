@@ -25,4 +25,4 @@ it_installs_latest_ruby() {
 
 . ./helper.sh
 
-orb_implode
+orb implode

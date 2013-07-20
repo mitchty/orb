@@ -23,4 +23,4 @@ it_installs_latest_rbx() {
 
 . ./helper.sh
 
-orb_implode
+orb implode

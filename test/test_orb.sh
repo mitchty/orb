@@ -36,19 +36,19 @@ it_sources_ok() {
 }
 
 it_removes_itself_ok() {
-  orb_implode
+  orb implode
 }
 
 it_really_leaves_no_variables_behind() {
   source ./orb.sh
-  orb_implode
+  orb implode
   var_count=$(set | egrep -a "^(orb|ORB)_" | wc -l)
   assertEquals 0 $var_count
 }
 
 it_really_leaves_no_functions_behind() {
   source ./orb.sh
-  orb_implode
+  orb implode
   func_count=$(typeset -f | egrep "^orb_" | wc -l)
   assertEquals 0 $func_count
 }
@@ -68,7 +68,7 @@ it_modifies_path_properly() {
     orb_ruby=$(which ruby)
     assertEquals $path_prior $PATH
     assertEquals $system_ruby $orb_ruby
-    orb_implode
+    orb implode
   else
     echo "Warning: no system ruby found."
     assertEquals 0 0

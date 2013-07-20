@@ -188,6 +188,28 @@ orb_ls_internal()
          echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
 }
 
+# similar to ls, which tells us which interpreter we're using, if not at all
+# returns system
+#
+# if there isn't ANY intepreter, returns 1
+orb_which()
+{
+  lang=$1
+  dir=$(which $lang)
+  if [[ $? == 1 ]]; then
+    return 1;
+  fi
+
+  lang_base=$(eval "orb_${lang}_basedir")
+  # meh, this is lame but it'll do for now.
+  echo $dir | grep $lang_base > /dev/null 2>&1
+  if [[ $? == 0 ]]; then
+    echo $(echo $dir | sed -e "s|$lang_base/||g" -e "s|/bin/$lang||g")
+  else
+    echo 'system'
+  fi
+}
+
 orb_pick()
 {
   lang=$1
@@ -215,7 +237,8 @@ orb_pick_private()
 
   for param in $*; do
     [[ $param == 'all' ]] && use_all=0
-    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' || $param == 'use' || $param == 'implode' ]]; then
+    if [[ $param == 'do' || $param == 'ls' || $param == 'rm' ||\
+          $param == 'use' || $param == 'implode' || $param == 'which' ]]; then
       action=$param; break
     fi
     (( do_index=do_index+1 ))
@@ -260,6 +283,10 @@ orb_pick_private()
     orb_use_internal $lang $*
   elif [[ $action == 'ls' ]]; then
     orb_ls_internal $lang
+  elif [[ $action == 'implode' ]]; then
+    orb_implode
+  elif [[ $action == 'which' ]]; then
+    orb_which $lang
   else
     orb_pick $lang
   fi
@@ -270,8 +297,6 @@ orb()
   orb_pick_private 'ruby' $*
 }
 
-  elif [[ $action == 'implode' ]]; then
-    orb_implode
 opl()
 {
   orb_pick_private 'perl' $*
