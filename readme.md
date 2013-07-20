@@ -1,22 +1,26 @@
 # orb.sh, the opinionated ruby/perl chooser
 
-Consider this a work in progress at best until I finish writing tests for everything. Proof of concept basically. It "works" for varying definitions of work.
+Consider this a work in progress at best until I finish writing tests for everything. Proof of concept basically. It "works" for varying definitions of the word.
 
 Why not rbenv?
 
-I don't like shims that are shell wrappers, and no need to exec a shell just to exec ruby.
+I don't like shims that are shell wrappers, and there really is no need to exec a shell just to exec ruby.
 
 Why not rvm?
 
-More complicated that it needs to be. I like simple.
+More complicated that it needs to be.
 
 Why not perlbrew?
 
 About the same, plus this is all in one.
 
+Why not chruby?
+
+Well to be honest I would use that if all I wanted was to deal with just switching rubies. But I have a bug up my ass that I want something that does perl/python(not yet)/ruby all in one. So here we are.
+
 Why use this instead?
 
-It's a few lines of semi-simple shell that modifies your running shells $PATH. Outside of typing export PATH=/foo/bar/baz/bin, this is about the most basic you can make it. Its also fast, no fork/execs just to get at your executable.
+It's a few lines of semi-simple(ish) shell that modifies the running shells $PATH. Outside of typing export PATH=/foo/bar/baz/bin, this is about the most basic you can make it. Its also fast, no fork/execs just to get at your executable. Just source orb.sh in and start choosing things.
 
 # How do I use it?
 
@@ -24,13 +28,19 @@ Well assuming you've git cloned it to say $HOME its simple.
 
 > . ${HOME}/orb/orb.sh
 
-Install a ruby using the handy dandy script there as well:
+Install some version of ruby using the handy dandy script there as well:
 
 > ${HOME}/orb/ruby-install
 
+Or perl:
+
+> ${HOME}/orb/perl-install
+
+(python coming when it bugs me enough :D)
+
 ## interactively
 
-Type orb and then pick the directory you want.
+Type orb and then pick installed ruby you want. Similarly, typing opl will allow you to choose the perl you use.
 
 Example:
 > $ orb
@@ -53,10 +63,21 @@ note, picking system just removes any changes from $PATH.
 
 orb use 1.9.3-p327
 
-## But I don't want that dir in $PATH anymore!
+## I don't like it, how do I remove it?
 
-No worries, typing orb_implode removes everything it sets up.
+No worries, typing *orb implode* removes everything it sets up.
 
-Thats it!
+Thats it (for now)!
 
-Known to work on zsh on OSX/Leopardish+ and Linux. Should work with ksh and bash as well, probably old school bourne too. Might work on Solaris/AiX/HPUX.
+Known/testedish to work on zsh on OSX/Leopardish+ and Linux. Should work with ksh and bash as well, probably old school bourne too. Might work on Solaris/AiX/HPUX but no guarantees.
+
+## TODO
+
+God lots of things left to do.
+
+TDD/BDD this old POS script with Test::More and make it mostly just a perl module. (WIP)
+Make it more modular for compiles/etc.. right now its pretty pathetic.
+Make it more compatible with the other ruby version managers.
+Add in python support, i've been lazy.
+Start testing with Vagrant on all the os's I want to care about.
+
