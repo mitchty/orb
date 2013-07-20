@@ -17,6 +17,14 @@
 ## no critic (ValuesAndExpressions::RequireQuotedHeredocTerminator)
 ## no critic (Miscellanea::ProhibitUselessNoCritic)
 ## no critic (Subroutines::RequireFinalReturn)
+BEGIN {
+  use File::Basename qw(dirname basename);
+  use Cwd qw(abs_path);
+
+  my $_dir = abs_path(dirname(__FILE__));
+  push(@INC, $_dir) if(grep(@INC, $_dir));
+}
+
 use strict;
 use warnings;
 
@@ -24,8 +32,11 @@ use Getopt::Long;
 use Env
   qw(HOME LDFLAGS CPPFLAGS TMPDIR orb_base orb_cache orb_logs orb_ruby_base orb_perl_base orb_python_base);
 use POSIX qw(getcwd);
-use File::Basename qw(dirname basename);
 use File::Temp qw(tempdir);
+use File::Basename qw(dirname basename);
+
+# Lets start to do this somewhat sanely with tdd.
+use Orb::Install;
 
 # Defining say here only due to wanting to be able to be run on perls
 # older than 5.10ish.
@@ -34,7 +45,6 @@ use File::Temp qw(tempdir);
 ## no critic (Subroutines::RequireArgUnpacking)
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 unless ( defined say() ) {
-
   sub say {
     local $\ = "\n";
     foreach my $line (@_) { print $line; }
@@ -43,7 +53,7 @@ unless ( defined say() ) {
 }
 
 my $script_language = 'unknown';
-my $script_name     = basename($0);
+my $script_name = basename(__FILE__);
 
 if ( $script_name =~ /^(perl|python|ruby)[-]/mxsi ) {
   $script_language = $&;
@@ -95,7 +105,7 @@ my $perl_run_tests     = 1;
 
 # language vm defaults
 my %lang_defaults = (
-                      'ruby'  => '2.0.0-p195',
+                      'ruby'  => '2.0.0-p247',
                       'jruby' => '1.7.4',
                       'rbx'   => 'head',
                       'perl'  => '5.18.0',
@@ -214,17 +224,22 @@ FIN
     'h'    => sub { help(1); },
             )
     or help(1);
-
+} elsif ($script_name eq 'web-versions') {
+  say "jruby:" . Orb::Install::latest_jruby_from_web;
+  say "ruby:" . Orb::Install::latest_ruby_from_web;
+  say "perl:" . Orb::Install::latest_perl_from_web;
+  exit 0;
 } else {
-  say "call me as ruby-install or perl-install to install ruby or perl.";
+  say "Call me as ruby-install or perl-install to install ruby or perl.";
 
-  say "latest known vm versions";
+  say "Latest known vm versions";
   say "engine: version";
 
   foreach my $engine (keys(%lang_defaults)) {
     my $version = $lang_defaults{$engine};
     say "$engine: $version";
   }
+
   exit 1;
 }
 
