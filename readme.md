@@ -1,46 +1,54 @@
-# orb.sh, the opinionated ruby/perl chooser
+# orb.sh, my opinionated ruby/perl/python chooser
 
 Consider this a work in progress at best until I finish writing tests for everything. Proof of concept basically. It "works" for varying definitions of the word.
 
-Why not rbenv?
+* Why not rbenv?
 
 I don't like shims that are shell wrappers, and there really is no need to exec a shell just to exec ruby.
 
-Why not rvm?
+* Why not rvm?
 
 More complicated that it needs to be.
 
-Why not perlbrew?
+* Why not perlbrew?
 
 About the same, plus this is all in one.
 
-Why not chruby?
+* Why not chruby?
 
-Well to be honest I would use that if all I wanted was to deal with just switching rubies. But I have a bug up my ass that I want something that does perl/python(not yet)/ruby all in one. So here we are.
+Well to be honest I would use that if all I wanted was to deal with just switching ruby interpreters. But I have a bug up my ass that I want something that does perl/python/ruby all in one. So here we are.
 
-Why use this instead?
+* So what is this good for in general?
 
 It's a few lines of semi-simple(ish) shell that modifies the running shells $PATH. Outside of typing export PATH=/foo/bar/baz/bin, this is about the most basic you can make it. Its also fast, no fork/execs just to get at your executable. Just source orb.sh in and start choosing things.
 
+I personally use it to make testing against rbx/ruby/jruby/perl head simple. Always nice to know in advance what will be coming down the pike.
+
 # How do I use it?
 
-Well assuming you've git cloned it to say $HOME its simple.
+> cd $HOME && git clone https://github.com/mitchty/orb .orb
 
-> . ${HOME}/orb/orb.sh
+> . ${HOME}/.orb/orb.sh
 
-Install some version of ruby using the handy dandy script there as well:
+If you don't like the default of ${HOME}/.orb, you can clone it anywhere and then set orb_base to that directory instead.
 
-> ${HOME}/orb/ruby-install
+Then install some version of perl/ruby/jruby/rbx:
+
+> orb install
 
 Or perl:
 
-> ${HOME}/orb/perl-install
+> opl install
 
-(python coming when it bugs me enough :D)
+Or python:
 
-## interactively
+> opy install
 
-Type orb and then pick installed ruby you want. Similarly, typing opl will allow you to choose the perl you use.
+For help just run orb install --help.
+
+## Interactively choose intepreter
+
+Type orb and then pick installed ruby you want. Similarly, typing opl will allow you to choose the perl you use. And the same applies for opy and choosing python.
 
 Example:
 > $ orb
@@ -59,13 +67,15 @@ Example:
 
 note, picking system just removes any changes from $PATH.
 
-## non-interactively muck with $PATH
+## Non-interactively muck with $PATH
 
-orb use 1.9.3-p327
+> orb use ruby-1.9.3-p327
+> opl use perl-5.18.0
+> opy use python-3.3.2
 
 ## I don't like it, how do I remove it?
 
-No worries, typing *orb implode* removes everything it sets up.
+No worries, typing *orb implode* removes everything it sets up in the current shell. Then simply remove the directory.
 
 Thats it (for now)!
 
@@ -75,9 +85,18 @@ Known/testedish to work on zsh on OSX/Leopardish+ and Linux. Should work with ks
 
 God lots of things left to do.
 
-TDD/BDD this old POS script with Test::More and make it mostly just a perl module. (WIP)
-Make it more modular for compiles/etc.. right now its pretty pathetic.
-Make it more compatible with the other ruby version managers.
-Add in python support, i've been lazy.
-Start testing with Vagrant on all the os's I want to care about.
+TDD/BDD this old POS script with Test::More and make it mostly just a perl module. (WIP) This is an ancient script thats just been hacked until it worked. TDD could do it good.
 
+Make it more modular for compiles/etc.. right now its pretty pathetic.
+
+Make it more compatible with the other ruby version managers.
+
+Add in python/pypy support, I've been lazy.
+
+Start testing with Vagrant on all the os's automatically.
+
+Make the installer more intelligent so it doesn't always install ffi/yaml for ruby.
+
+I'm thinking of just making each engine a directory instead of concatenating things together.
+
+Shell completion support for zsh, bash eventually.

@@ -11,8 +11,7 @@ $VERSION     = 0.01;
 @ISA         = qw(Exporter);
 @EXPORT      = qw();
 @EXPORT_OK   = qw();
-%EXPORT_TAGS = ( DEFAULT => [qw(&push_cwd &pop_cwd &get_url &get_url_content latest_perl_from_web latest_ruby_from_web latest_jruby_from_web)],
-#                 Both    => [qw(&func1 &func2)]);
+%EXPORT_TAGS = ( DEFAULT => [qw(&push_cwd &pop_cwd &get_url &get_url_content &latest_perl_from_web &latest_ruby_from_web &latest_jruby_from_web &latest_python_from_web &python_download_url)],
 );
 
 our @DIRSTACK = ();
@@ -61,14 +60,15 @@ sub get_url {
   $save_filename = "$save_to_dir\/$save_filename";
 
   my $content = get_url_content($url);
+
   if ($content){
     open (my $fh, '>', $save_filename) or return 0;
     print $fh $content;
-    close $fh
+    close $fh;
+    return $save_filename;
   }else{
     return 1;
   }
-  return 0;
 };
 
 sub latest_perl_from_web {
@@ -99,6 +99,23 @@ sub latest_jruby_from_web {
     $jruby_version = $&;
   }
   return $jruby_version;
+};
+
+# python is python3 new hotness, python2 is the old and busted
+sub latest_python_from_web {
+  my $url = 'http://python.org/download/';
+  my $page = get_url_content($url);
+  my $python_version = 'unknown';
+  if ($page =~ m/Python\s\K3[.]\d+[.]\d+/){
+    $python_version = $&;
+  }
+  return $python_version;
+};
+
+sub python_download_url {
+  my $version = shift || latest_python_from_web();
+  my $url = sprintf('http://python.org/ftp/python/%s/Python-%s.tgz', $version, $version);
+  return $url;
 };
 
 1;

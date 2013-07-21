@@ -105,10 +105,11 @@ my $perl_run_tests     = 1;
 
 # language vm defaults
 my %lang_defaults = (
-                      'ruby'  => '2.0.0-p247',
-                      'jruby' => '1.7.4',
-                      'rbx'   => 'head',
-                      'perl'  => '5.18.0',
+                      'ruby'   => '2.0.0-p247',
+                      'jruby'  => '1.7.4',
+                      'rbx'    => 'head',
+                      'python' => '3.3.2',
+                      'perl'   => '5.18.0',
                     );
 
 my $help_message = 'default help message';
@@ -193,13 +194,13 @@ $0 --prefix=$install_prefix
     --cache    Where to save what we download.
       Default: $cache_dir
     --rm       Remove the install to dir before installing.
-      Note:    Only allowed if prefix isn't set.
+      Note:    Only allowed if prefix isn\'t set.
     --append   Append a string to the install to allow tagging.
       Example: --append=foo with defaults results in perl-version
       Default: nope
     --no-append  Append the perl/version information to the prefix install?
       Default: Append. Say prefix is /tmp/foo, with this on you would
-               Install to /tmp/foo/perl-5.16.2 for example.
+               Install to /tmp/foo/perl-someversion for example.
 FIN
 
   GetOptions(
@@ -224,10 +225,58 @@ FIN
     'h'    => sub { help(1); },
             )
     or help(1);
-} elsif ($script_name eq 'web-versions') {
-  say "jruby:" . Orb::Install::latest_jruby_from_web;
-  say "ruby:" . Orb::Install::latest_ruby_from_web;
-  say "perl:" . Orb::Install::latest_perl_from_web;
+} elsif ( $script_language eq 'python' ) {
+  $help_message = <<FIN;
+usage:
+$0 --prefix=$install_prefix
+  --cache=$cache_dir
+  --version=[head|vm_version]
+
+  Options:
+    --version  What version of python to install, references defaults.
+      Note:    head not yet implemented
+      Default: perl = $lang_defaults{'perl'}
+    --prefix   What directory to install to, need to have write perms.
+      Default: $install_prefix
+    --cache    Where to save what we download.
+      Default: $cache_dir
+    --rm       Remove the install to dir before installing.
+      Note:    Only allowed if prefix isn\'t set.
+    --append   Append a string to the install to allow tagging.
+      Example: --append=foo with defaults results in perl-version
+      Default: nope
+    --no-append  Append the python/version information to the prefix install?
+      Default: Append. Say prefix is /tmp/foo, with this on you would
+               Install to /tmp/foo/python-somversion for example.
+FIN
+
+  GetOptions(
+    'prefix=s'  => \$install_prefix,
+    'version=s' => \$lang_version,
+    'cache=s'   => \$cache_dir,
+    'no-append' => sub { $append_prefix = 0; },
+    'append'    => sub { $append_prefix = 1; },
+    'rm'        => sub { $rm_existing = 1; },
+    'suffix=s'  => \$suffix,
+    'no-cpanm'  => sub { $perl_install_cpanm = 1; },
+
+    # yes this is wonky, its inverted for a later conditional
+    # it makes the if test more readable... ish
+    'no-test' => sub { $perl_run_tests = 0; },
+    'debug'   => sub { $debug_flag     = 0; },
+    'd'       => sub { $debug_flag     = 0; },
+    'tmp=s'   => \$tmp_base,
+    'verbose' => sub { $verbose_flag   = 0; },
+    'v'       => sub { $verbose_flag   = 0; },
+    'help' => sub { help(1); },
+    'h'    => sub { help(1); },
+            )
+    or help(1);
+} elsif ( $script_name eq 'web-versions' ) {
+  say "jruby:"  . Orb::Install::latest_jruby_from_web;
+  say "ruby:"   . Orb::Install::latest_ruby_from_web;
+  say "perl:"   . Orb::Install::latest_perl_from_web;
+  say "python:" . Orb::Install::latest_python_from_web;
   exit 0;
 } else {
   say "Call me as ruby-install or perl-install to install ruby or perl.";
@@ -300,15 +349,17 @@ sub perlurl {
 
 sub full_vm_version {
   my %vm_map = (
-                 'ruby'  => $lang_defaults{'ruby'},
-                 'rbx'   => $lang_defaults{'rbx'},
-                 'jruby' => $lang_defaults{'jruby'},
-                 'perl'  => $lang_defaults{'perl'},
+                 'ruby'   => $lang_defaults{'ruby'},
+                 'rbx'    => $lang_defaults{'rbx'},
+                 'jruby'  => $lang_defaults{'jruby'},
+                 'perl'   => $lang_defaults{'perl'},
+                 'python' => $lang_defaults{'python'},
                );
 
   my %vm_defaults = (
-                      'ruby' => 'ruby',
-                      'perl' => 'perl',
+                      'ruby'   => 'ruby',
+                      'perl'   => 'perl',
+                      'python' => 'python',
                     );
 
   $lang_vm = ( $lang_vm eq 'default' ) ? $script_language : $lang_vm;
@@ -638,6 +689,52 @@ sub install_jruby {
   return;
 }
 
+sub install_python {
+  my $dir = q{};
+  my $configure = "--prefix=$install_prefix";
+
+  if ( $lang_version ne 'head' ) {
+    my $url = Orb::Install::python_download_url($lang_version);
+    my $file = url_filename($url);
+    $dir = $file;
+    $dir =~ s/[.]tgz//sm;
+
+    my $extract_dir = $dir;
+    my $filename = "$cache_dir/$file";
+
+    my $rc = Orb::Install::get_url($url, $file, $cache_dir);
+    unless ($rc eq 1) {
+      $dir = extract_tgz($rc) . "/$dir";
+      chdir $dir;
+
+      configure_dir( $dir, "$configure" );
+
+      build_with( 'make', $dir, 'install' );
+
+      python_finalize($install_prefix);
+    }
+  } else {
+    say "I can't build python head yet, sorry.";
+  }
+
+  return;
+}
+
+sub python_finalize {
+  my $dir = shift;
+  say 'Creating python link';
+  my $suffix = 3;
+  if ($lang_version =~ m/^\d/) {
+    $suffix = $&;
+  }
+
+  my $python_link = "$dir\/bin/python";
+  unless ( -f $python_link) {
+    chdir "$dir/bin";
+    log_cmd "ln -s python$suffix python";
+  }
+}
+
 sub jruby_finalize {
   my $dir = shift;
 
@@ -711,6 +808,7 @@ my %install_switch = (
                        'rbx'     => sub { install_rbx(); },
                        'jruby'   => sub { install_jruby(); },
                        'perl'    => sub { install_perl(); },
+                       'python'  => sub { install_python(); },
                        'default' => sub { die "bug!\n"; },
                      );
 

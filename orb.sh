@@ -214,7 +214,7 @@ orb_install()
 {
   lang=$1
   shift;shift
-  if [[ $lang == 'ruby' || $lang == 'perl' ]]; then
+  if [[ $lang == 'ruby' || $lang == 'perl' || $lang == 'python' ]]; then
     ${orb_base}/${lang}-install $*
   else
     echo "can't make $lang yet"
