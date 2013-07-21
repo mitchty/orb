@@ -52,17 +52,11 @@ Type orb and then pick installed ruby you want. Similarly, typing opl will allow
 
 Example:
 > $ orb
->
 > 1) system   3) rbx-head               5) ruby-1.9.3-p125
->
 > 2) jruby-1.6.7            4) ruby-1.9.3-p0          6) ruby-1.9.3-p194
->
 > ruby?: 2
->
 > Adding jruby-1.6.7 to $PATH
->
 > $ ruby -v
->
 > jruby 1.6.7 (ruby-1.8.7-p357) (2012-02-22 3e82bc8) (OpenJDK 64-Bit Server VM 1.7.0-jdk7u6-b07) [darwin-universal-java]
 
 note, picking system just removes any changes from $PATH.
