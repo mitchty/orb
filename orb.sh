@@ -210,6 +210,17 @@ orb_which()
   fi
 }
 
+orb_install()
+{
+  lang=$1
+  shift;shift
+  if [[ $lang == 'ruby' || $lang == 'perl' ]]; then
+    ${orb_base}/${lang}-install $*
+  else
+    echo "can't make $lang yet"
+  fi
+}
+
 orb_pick()
 {
   lang=$1
@@ -238,7 +249,8 @@ orb_pick_private()
   for param in $*; do
     [[ $param == 'all' ]] && use_all=0
     if [[ $param == 'do' || $param == 'ls' || $param == 'rm' ||\
-          $param == 'use' || $param == 'implode' || $param == 'which' ]]; then
+          $param == 'use' || $param == 'implode' || $param == 'which' ||\
+          $param == 'install' ]]; then
       action=$param; break
     fi
     (( do_index=do_index+1 ))
@@ -287,6 +299,8 @@ orb_pick_private()
     orb_implode
   elif [[ $action == 'which' ]]; then
     orb_which $lang
+  elif [[ $action == 'install' ]]; then
+    orb_install $lang $*
   else
     orb_pick $lang
   fi
