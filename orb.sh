@@ -184,8 +184,10 @@ orb_python_basedir()
 orb_ls_internal()
 {
   lang=$1
-  echo $(cd $(eval "orb_${lang}_basedir") &&
-         echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
+  if [[ -d $(orb_${lang}_basedir) ]]; then
+    echo $(cd $(eval "orb_${lang}_basedir") &&
+      echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
+  fi
 }
 
 # similar to ls, which tells us which interpreter we're using, if not at all
