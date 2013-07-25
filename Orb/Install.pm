@@ -5,7 +5,6 @@ use strict;
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use POSIX qw(getcwd);
-use LWP 5.64;
 
 $VERSION     = 0.01;
 @ISA         = qw(Exporter);
@@ -19,8 +18,18 @@ our @DIRSTACK = ();
 sub push_cwd() { return push(@DIRSTACK, getcwd()); }
 sub pop_cwd() { return pop(@DIRSTACK); }
 
-our $DEFAULT_DL_METHOD = 'lwp';
+our $DEFAULT_DL_METHOD = 'curl';
 our $download_method = $DEFAULT_DL_METHOD;
+
+# Detect if LWP is available on the system we're on, use it if so.
+eval {
+  require LWP;
+  LWP->import();
+};
+
+unless($@) {
+  $download_method = 'lwp';
+}
 
 our $CACHE_DIR = '/tmp';
 
