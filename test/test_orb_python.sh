@@ -32,13 +32,15 @@ it_should_detect_python_installs_to_orb_python_base() {
 
 it_should_use_python_installs_to_orb_python_base() {
   set +e
+  set -x
   orb_base=$(pwd)
   . ./orb.sh
   mock_python=$orb_python_base/default/bin/python
   mock_install $mock_python
   opy use default
   assertEquals "${mock_python}" "$(which python)"
-  assertEquals "system" $(opy which)
+  assertEquals "default" $(opy which)
+  set +x
   orb implode
 }
 
