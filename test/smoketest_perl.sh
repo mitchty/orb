@@ -19,7 +19,7 @@ it_installs_latest_perl() {
   opl use ${engine_name}
 
   sandbox_perl=$orb_perl_base/${engine_name}/bin/perl
-  perl_ver_string=$(perl -v | perl -pe 's/\sbuilt\sfor\s.*//g;' | grep 'This is')
+  perl_ver_string=$(perl -v | perl -pe 's/\s\(.*\sbuilt\sfor\s.*//g;' | grep 'This is')
 
   set -e
   assertEquals "$sandbox_perl" "$(which perl)"

@@ -109,7 +109,7 @@ my %lang_defaults = (
                       'jruby'  => '1.7.4',
                       'rbx'    => 'head',
                       'python' => '3.3.2',
-                      'perl'   => '5.18.0',
+                      'perl'   => '5.18.1',
                     );
 
 my $help_message = 'default help message';

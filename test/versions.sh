@@ -11,8 +11,13 @@ python_version=$(grep "^python:" ${dir}/versions | awk -F: '{print $2}')
 
 jruby_verbose="(1.9.3p392) 2013-05-16 2390d3b"
 ruby_verbose="(2013-06-27 revision 41674)"
-perl_verbose="This is perl 5, version 18, subversion 0 (v5.18.0)"
 python_verbose="Python ${python_version}"
+
+# Lets be a bit less lazy shall we
+perl_major=$(echo ${perl_version} | awk -F\. '{print $2}')
+perl_minor=$(echo ${perl_version} | awk -F\. '{print $3}')
+
+perl_verbose="This is perl 5, version ${perl_major}, subversion ${perl_minor}"
 
 # so we can eval output in helper.sh
 cat <<EOF
