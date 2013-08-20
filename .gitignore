@@ -1,4 +1,6 @@
 test/sandbox
+test/test-results
+test/trash_directory*
 cache
 rubies
 perls
