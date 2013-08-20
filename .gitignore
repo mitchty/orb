@@ -1,5 +1,5 @@
-test/test-results
-test/trash_directory*
+**/test-results
+**/trash_directory*
 cache
 rubies
 perls

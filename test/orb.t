@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 #-*-mode: Shell-script; coding: utf-8;-*-
+script=$(basename $0)
 dir=$(cd $(dirname $0); pwd)
 iam=${dir}/${script}
 
@@ -7,18 +8,19 @@ iam=${dir}/${script}
 # probably outside the scope of this test though.
 test_description="Ensure orb works sanely..ish"
 
-. ./sharness_helper.sh
-. ./sharness.sh
+cd ${dir}
+. ${dir}/sharness_helper.sh
+. ${dir}/sharness.sh
 
 setup_sandbox
 
 # TODO: I'm really thinking of moving the lot of the shell into perl proper
 # after adding these tests...
-test_expect_success "orb.sh appears OK to running SHELL" "
+test_expect_success "$SHELL -n orb.sh is fine with things" "
    $SHELL -n orb.sh
 "
 
-test_expect_success "orb.sh sources with running SHELL" "
+test_expect_success "orb.sh sources with $SHELL" "
   source ./orb.sh
 "
 
@@ -26,13 +28,13 @@ test_expect_success "orb cleans up after itself like a good little doggy" "
   orb implode
 "
 
-test_expect_success "orb leaves no man, err variables behind after implosion" "
+test_expect_success "orb leaves no man, err variables behind after cleanup" "
   source ./orb.sh
   orb implode
   test $(set | egrep -c -a '^(orb|ORB)_') -eq 0
 "
 
-test_expect_success "orb leaves no functions behind either" "
+test_expect_success "orb leaves no functions behind either after cleanup" "
   source ./orb.sh
   orb implode
   test $(typeset -f | egrep -c '^orb_') -eq 0
