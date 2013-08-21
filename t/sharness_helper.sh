@@ -23,11 +23,21 @@ mock_install()
   input=$1
   file=$(basename "$input")
   dirs=$(dirname "$input")
-  mkdir -p $dirs
+  [[ ! -d ${dirs} ]] && mkdir -p $dirs
   cat <<EOF > $dirs/$file
 #!/usr/bin/env sh
 echo $file
 exit 0
 EOF
   chmod 755 $dirs/$file
+}
+
+guard_orb()
+{
+  # I want a good, clean, fight, I mean test run, whatever, just don't run
+  # tests if we're in an already setup environment.
+  if test $(set | egrep -c -a '^(orb|ORB)_') -ne 0 ; then
+    say "Nooope, running in an environment with orb already setup, aborting"
+    exit 1
+  fi
 }
