@@ -48,7 +48,7 @@ test_expect_success "orb munges PATH correctly" "
     system_ruby=$(which ruby)
     orb_base=$(pwd)
     export orb_base
-    . ./orb.sh
+    source ./orb.sh
     mock_ruby=$orb_ruby_base/default/bin/ruby
     mock_install $orb_ruby_base/default/ruby
     orb use default
