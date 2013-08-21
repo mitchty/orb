@@ -41,7 +41,7 @@ pre-clean:
 	$(RM) -r test-results
 
 clean:
-	$(RM) -r 'trash directory'.* test-results
+	$(RM) -r 'trash_directory'.* test-results
 	$(RM) .prove
 
 aggregate-results-and-cleanup: $(T)
