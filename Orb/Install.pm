@@ -81,17 +81,17 @@ sub get_url {
 };
 
 sub latest_perl_from_web {
-  my $url = 'http://www.perl.org';
+  my $url = 'http://www.perl.org/get.html';
   my $page = get_url_content($url);
   my $perl_version = 'unknown';
-  if ($page =~ m/Perl\s\K\d[.]\d+[.]\d+/){
+  if ($page =~ m/currently\s\K5[.]\d+[.]\d+/){
     $perl_version = $&;
   }
   return $perl_version;
 };
 
 sub latest_ruby_from_web {
-  my $url = 'http://www.ruby-lang.org/en/downloads/';
+  my $url = 'https://www.ruby-lang.org/en/downloads/';
   my $page = get_url_content($url);
   my $ruby_version = 'unknown';
   if ($page =~ m/stable\sversion\sis\s\K\d+[.]\d+[.]\d+[-]p\d+/){
