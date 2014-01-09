@@ -41,8 +41,8 @@ pre-clean:
 	$(RM) -r test-results
 
 clean:
-	$(RM) -r 'trash_directory'.* test-results
-	$(RM) .prove
+	-$(RM) -r 'trash_directory'.* test-results
+	-$(RM) .prove
 
 aggregate-results-and-cleanup: $(T)
 	$(MAKE) aggregate-results
