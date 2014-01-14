@@ -37,6 +37,7 @@ use File::Basename qw(dirname basename);
 
 # Lets start to do this somewhat sanely with tdd.
 use Orb::Install;
+use Orb::Test;
 
 # Defining say here only due to wanting to be able to be run on perls
 # older than 5.10ish.
@@ -105,11 +106,10 @@ my $perl_run_tests     = 1;
 
 # language vm defaults
 my %lang_defaults = (
-                      'ruby'   => '2.0.0-p247',
-                      'jruby'  => '1.7.4',
-                      'rbx'    => 'head',
-                      'python' => '3.3.2',
-                      'perl'   => '5.18.1',
+                      'ruby'   => $Orb::Test::test_ruby_version,
+                      'jruby'  => $Orb::Test::test_jruby_version,
+                      'python' => $Orb::Test::test_python_version,
+                      'perl'   => $Orb::Test::test_perl_version,
                     );
 
 my $help_message = 'default help message';
