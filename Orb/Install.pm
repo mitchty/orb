@@ -94,8 +94,14 @@ sub latest_ruby_from_web {
   my $url = 'https://www.ruby-lang.org/en/downloads/';
   my $page = get_url_content($url);
   my $ruby_version = 'unknown';
+  # X.Y.Z-pABC
   if ($page =~ m/stable\sversion\sis\s\K\d+[.]\d+[.]\d+[-]p\d+/){
     $ruby_version = $&;
+  # X.Y.Z no patch level
+  }elsif($page =~ m/stable\sversion\sis\s\K\d+[.]\d+[.]\d+/){
+    $ruby_version = $&;
+  }else{
+    warn "Regex match for ruby version failure.";
   }
   return $ruby_version;
 };
