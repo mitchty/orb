@@ -30,7 +30,7 @@ use warnings;
 
 use Getopt::Long;
 use Env
-  qw(HOME LDFLAGS CPPFLAGS TMPDIR orb_base orb_cache orb_logs orb_ruby_base orb_perl_base orb_python_base);
+  qw(HOME LDFLAGS CPPFLAGS TMPDIR CONFIGURE_OPTS orb_base orb_cache orb_logs orb_ruby_base orb_perl_base orb_python_base);
 use POSIX qw(getcwd);
 use File::Temp qw(tempdir);
 use File::Basename qw(dirname basename);
@@ -573,6 +573,9 @@ sub install_ruby {
   my $configure =
 "--prefix=$install_prefix --with-opt-dir=$install_prefix --with-out-ext=tcl --with-out-ext=tk";
 
+  if ( defined($CONFIGURE_OPTS) ) {
+    $configure = "$configure $CONFIGURE_OPTS";
+  }
   if ( $lang_version ne 'head' ) {
     my $url  = rubyurl("$lang_version");
     my $file = url_filename($url);
