@@ -70,7 +70,7 @@ orb_add_path()
 orb_implode()
 {
   orb_implode_ruby; orb_implode_perl; orb_implode_python
-  unset orb; unset opl; unset opy
+  unset -f orb; unset -f opl; unset -f opy
   for var in $(set | egrep -a "^(orb|ORB)_" | awk -F= '{print $1}'); do
     unset $var
   done
