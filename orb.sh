@@ -184,7 +184,8 @@ orb_python_basedir()
 orb_ls_internal()
 {
   lang=$1
-  if [[ -d $(orb_${lang}_basedir) ]]; then
+  lang_basedir="$(orb_${lang}_basedir)"
+  if [[ -d ${lang_basedir} ]]; then
     echo $(cd $(eval "orb_${lang}_basedir") &&
       echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
   fi
