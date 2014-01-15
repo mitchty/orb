@@ -126,17 +126,16 @@ if ( $script_language eq 'ruby' ) {
 usage:
 $0 --prefix=$install_prefix
    --cache=$cache_dir
-   --ruby=[ruby|jruby|rbx] --version=[head|vm_version]
+   --ruby=[ruby|jruby] --version=[head|vm_version]
    --no-yaml --no-ffi --rm
 
   Options:
-    --ruby     What ruby to install, ruby/rbx/jruby.
+    --ruby     What ruby to install, ruby/jruby.
       Default: ruby
     --version  What version of ruby to install, reference defaults.
       Note:    if you specify head on any you will get the latest master
       Default: ruby  = $lang_defaults{'ruby'}
                jruby = $lang_defaults{'jruby'}
-               rbx   = $lang_defaults{'rbx'} (from git)
     --prefix   What directory to install to, need to have write perms.
       Default: $install_prefix
     --cache    Where to save what we download.
