@@ -100,8 +100,6 @@ sub latest_ruby_from_web {
   # X.Y.Z no patch level
   }elsif($page =~ m/stable\sversion\sis\s\K\d+[.]\d+[.]\d+/){
     $ruby_version = $&;
-  }else{
-    warn "Regex match for ruby version failure.";
   }
   return $ruby_version;
 };
