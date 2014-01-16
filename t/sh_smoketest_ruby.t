@@ -26,7 +26,7 @@ test_expect_success HAVEJAVA 'system has java' "which java > /dev/null 2>&1"
 orb_base=$(pwd)
 export orb_base
 
-[[ -d ${HOME}/.orb/cache ]] && rsync -az ${HOME}/.orb/cache/ $(pwd)/cache
+[[ -d ${HOME}/.orb/cache ]] && rsync -az ${HOME}/.orb/cache/ ${orb_base}/cache
 
 source ./orb.sh
 eval $(./versions.sh)

@@ -24,14 +24,13 @@ test_expect_success HAVEPERL 'system has perl' "which perl > /dev/null 2>&1"
 orb_base=$(pwd)
 export orb_base
 
-[[ -d ${HOME}/.orb/cache ]] && rsync -az ${HOME}/.orb/cache/ $(pwd)/cache
+[[ -d ${HOME}/.orb/cache ]] && rsync -az ${HOME}/.orb/cache/ ${orb_base}/cache
 
 source ./orb.sh
 eval $(./versions.sh)
 
-# MRI
 test_expect_success "opl install succeeds" "
-  opl install > /dev/null 2>&1
+  opl install --no-test > /dev/null 2>&1
 "
 
 test_expect_success "opl ls shows only system and perl install" "
