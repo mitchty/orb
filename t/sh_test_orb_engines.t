@@ -13,7 +13,9 @@ cd ${dir}
 setup_sandbox
 guard_orb
 
-source ./orb.sh
+test_expect_success "orb env doesn't exist" "
+  test $(set | egrep -c -a '^(orb|ORB|opl|opy)_') -eq 0
+"
 
 test_set_prereq HAVEPERL
 test_set_prereq HAVERUBY
@@ -22,6 +24,15 @@ test_set_prereq HAVEPYTHON
 test_expect_success HAVEPERL 'system has perl' "which perl > /dev/null 2>&1"
 test_expect_success HAVERUBY 'system has ruby' "which ruby > /dev/null 2>&1"
 test_expect_success HAVEPYTHON 'system has python' "which python > /dev/null 2>&1"
+
+orb_base=$(pwd)
+export orb_base
+
+source ./orb.sh
+
+mock_install $orb_ruby_base/default/bin/ruby
+mock_install $orb_perl_base/default/bin/perl
+mock_install $orb_python_base/default/bin/python
 
 # Test that we use the system engines by default correctly
 test_have_prereq HAVERUBY && test_expect_success "orb uses system ruby if present" "
@@ -40,42 +51,23 @@ test_have_prereq HAVEPYTHON && test_expect_success "opy uses system python if pr
 "
 
 test_have_prereq HAVERUBY && test_expect_success "orb detects installs to orb_ruby_base" "
-  orb_base=$(pwd)
-  export orb_base
-  source ./orb.sh
-  mock_install $orb_ruby_base/default/bin/ruby
-  set +x
-  orb ls
-  set -x
-  test 'system default' == $(orb ls)
+  test 'system default' == \"$(orb ls)\"
 "
 
 test_have_prereq HAVEPERL && test_expect_success "opl detects installs to orb_perl_base" "
-  orb_base=$(pwd)
-  export orb_base
-  source ./orb.sh
-  mock_install $orb_perl_base/default/bin/perl
-
-  test $(opl ls) == 'system default'
+  test 'system default' == \"$(opl ls)\"
 "
 
 test_have_prereq HAVEPYTHON && test_expect_success "opy detects installs to orb_python_base" "
-  orb_base=$(pwd)
-  export orb_base
-  source ./orb.sh
-  mock_install $orb_python_base/default/bin/python
-  test $(opy ls) == 'system default'
+  test 'system default' == \"$(opy ls)\"
 "
 
 test_have_prereq HAVERUBY && test_expect_success "orb detects installs to orb_ruby_base" "
-  orb_base=$(pwd)
-  export orb_base
-  source ./orb.sh
-  mock_install $orb_ruby_base/default/bin/ruby
   orb use default
-  test $(orb which) == 'default'
+  test 'system default' == \"$(orb ls)\"
 "
 
+test_done
 test_have_prereq HAVEPERL && test_expect_success "opl detects installs to orb_perl_base" "
   orb_base=$(pwd)
   export orb_base
