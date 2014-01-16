@@ -9,8 +9,8 @@ ruby_version=$(grep "^ruby:" ${dir}/versions | awk -F: '{print $2}')
 perl_version=$(grep "^perl:" ${dir}/versions | awk -F: '{print $2}')
 python_version=$(grep "^python:" ${dir}/versions | awk -F: '{print $2}')
 
-jruby_verbose="(1.9.3p392) 2013-05-16 2390d3b"
-ruby_verbose="(2013-06-27 revision 41674)"
+jruby_verbose="(1.9.3p392) 2014-01-10 c4ecd6b"
+ruby_verbose="(2013-12-25 revision 44422)"
 python_verbose="Python ${python_version}"
 
 # Lets be a bit less lazy shall we
