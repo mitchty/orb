@@ -187,7 +187,7 @@ orb_ls_internal()
   lang_basedir="$(orb_${lang}_basedir)"
   if [[ -d ${lang_basedir} ]]; then
     echo $(cd $(eval "orb_${lang}_basedir") &&
-      echo "system" $(ls -d *) | fmt -1 | grep -v '^\.' | fmt -1000)
+      echo "system" $(ls -d * 2>/dev/null) | fmt -1 | grep -v '^\.' | fmt -1000)
   fi
 }
 
