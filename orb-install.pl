@@ -142,7 +142,7 @@ $0 --prefix=$install_prefix
       Default: $cache_dir
     --no-yaml  Don't install libyaml, normally libyaml is installed so
                rubygems doesn't bitch about psych, all.. the... damntime.
-      Note:    installs libyaml-0.1.4
+      Note:    installs libyaml-0.1.5
     --no-ffi   Don't install libffi.
       Note:    installs libffi-git
 
@@ -505,7 +505,7 @@ sub build_with {
 
 sub install_yaml {
   say 'Installing libyaml.';
-  my $yaml_version = '0.1.4';
+  my $yaml_version = '0.1.5';
   my $destdir      = "yaml-$yaml_version";
   my $url          = "http://pyyaml.org/download/libyaml/$destdir.tar.gz";
   my $filename     = url_filename($url);
